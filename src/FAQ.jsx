@@ -49,7 +49,6 @@ const FAQ = () => {
           </h1>
           <p className="mt-4 text-gray-500 font-medium">Everything you need to know about our classes and process.</p>
           <div className="w-32 h-1 bg-orange-500 mx-auto mt-2  rounded-full"></div>
-
         </div>
 
         {/* FAQ Grid */}
@@ -128,14 +127,14 @@ const FAQ = () => {
                 <span>WhatsApp Now</span>
               </a>
 
-              {/* Email Premium Button */}
-              <button 
-                onClick={() => document.getElementById('footer-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="group relative flex items-center justify-center gap-3 bg-[#001f3f] text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest transition-all hover:shadow-[0_20px_40px_-10px_rgba(0,31,63,0.3)] hover:-translate-y-2 active:scale-95"
+              {/* Email Premium Button 🚀 FIXED: Ab click par native mailer open hoga */}
+              <a 
+                href="mailto:support@alquraninstitute.com?subject=Trial Class Inquiry&body=Assalamu Alaikum,%0D%0A%0D%0AI want to know more about the course structure and online class setup."
+                className="group relative flex items-center justify-center gap-3 bg-[#001f3f] text-white px-10 py-5 rounded-2xl font-black uppercase text-xs tracking-widest transition-all hover:shadow-[0_20px_40px_-10px_rgba(0,31,63,0.3)] hover:-translate-y-2 active:scale-95 text-center"
               >
                 <FaEnvelope size={20} /> 
                 <span>Send Email</span>
-              </button>
+              </a>
             </div>
           </div>
         </div>
