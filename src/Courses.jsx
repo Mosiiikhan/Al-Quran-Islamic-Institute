@@ -33,7 +33,7 @@ const Courses = () => {
         }
       } catch (err) {
         console.error("Public courses sync error:", err);
-        setCourses([]); // Fallback state array allocation safe guard tracking
+        setCourses([]);
       } finally {
         setLoading(false);
       }
@@ -41,75 +41,158 @@ const Courses = () => {
     fetchPublicCourses();
   }, []);
 
-  if (loading) return <div className="py-12 text-center text-gray-500 font-bold">Loading Quranic Programs Database...</div>;
+  if (loading) {
+    return (
+      <div className="py-24 flex flex-col items-center justify-center gap-4">
+        <div className="w-12 h-12 rounded-full border-4 border-orange-200 border-t-orange-500 animate-spin"></div>
+        <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Loading Programs...</p>
+      </div>
+    );
+  }
 
-  // 🚀 FALLBACK: Crash tracking shield logic
   const safeCourses = Array.isArray(courses) ? courses : [];
 
   return (
-    <section className="py-12 bg-gray-50 relative" id="courses-section">
-      <div className="max-w-7xl mx-auto px-6">
-        
-        {/* Section Heading */}
-        <div className="text-center mb-5">
-          <h2 className="text-sm font-bold text-orange-600 uppercase tracking-[0.3em] mb-2">Our Specialized Programs</h2>
-          <h1 className="text-4xl md:text-5xl font-black text-blue-900 tracking-tight">Explore Our Popular Courses</h1>
-          <div className="w-24 h-1 bg-orange-500 mx-auto mt-6"></div>
+    <section className="py-20 bg-[#f8faff] relative overflow-hidden" id="courses-section">
+
+      <div className="absolute top-0 left-0 w-72 h-72 bg-orange-100 rounded-full blur-3xl opacity-30 pointer-events-none -translate-x-1/2 -translate-y-1/2"></div>
+      <div className="absolute bottom-0 right-0 w-72 h-72 bg-sky-100 rounded-full blur-3xl opacity-30 pointer-events-none translate-x-1/2 translate-y-1/2"></div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+
+        <div className="text-center mb-14">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
+            <span className="text-orange-500 text-[11px] font-black uppercase tracking-[0.4em]">Our Specialized Programs</span>
+            <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-black text-blue-900 tracking-tight leading-tight">
+            Explore Our <span className="italic">Popular Courses</span>
+          </h1>
+          <p className="mt-4 text-slate-500 font-medium text-sm md:text-base max-w-xl mx-auto">
+            Structured Quranic programs designed for all ages — from complete beginners to advanced learners across the globe.
+          </p>
         </div>
 
-        {/* Dynamic Courses Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {safeCourses.length === 0 ? (
-            <div className="col-span-full text-center text-gray-400 py-6">No active programs added to cluster node.</div>
+            <div className="col-span-full text-center text-gray-400 py-12 font-semibold">
+              No active programs found.
+            </div>
           ) : (
             safeCourses.map((course) => (
-              <div key={course._id} className="group bg-white p-8 rounded-xl shadow-sm hover:shadow-2xl transition-all duration-500 border border-gray-100 flex flex-col items-center text-center relative overflow-hidden">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${course.color || 'from-teal-500 to-teal-700'} text-white flex items-center justify-center text-2xl mb-6 group-hover:rotate-12 transition-transform duration-300 shadow-lg`}>
+              <div
+                key={course._id}
+                className="group relative bg-white rounded-3xl p-7 shadow-md hover:shadow-2xl hover:shadow-blue-100 hover:-translate-y-2 transition-all duration-500 border border-slate-100 flex flex-col overflow-hidden"
+              >
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${course.color || 'from-teal-400 to-teal-600'} rounded-t-3xl`}></div>
+                <div className="absolute top-0 right-0 w-16 h-16 bg-slate-50 rounded-bl-[3rem] group-hover:bg-orange-50 transition-colors"></div>
+
+                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${course.color || 'from-teal-500 to-teal-700'} text-white flex items-center justify-center text-xl mb-5 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300 shadow-lg`}>
                   {IconDictionary[course.iconKey] || <FaBookOpen />}
                 </div>
 
-                <h3 className="text-xl font-bold text-[#001f3f] mb-4 group-hover:text-orange-600 transition-colors">{course.title}</h3>
-                <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-3">{course.desc}</p>
+                <h3 className="text-lg font-black text-[#001f3f] mb-3 group-hover:text-orange-600 transition-colors leading-snug">
+                  {course.title}
+                </h3>
 
-                <button onClick={() => setSelectedCourse(course)} className="mt-auto font-bold text-xs uppercase tracking-widest text-orange-600 hover:text-orange-700 transition-colors border-b border-transparent hover:border-orange-600 py-1">
-                  Learn More +
+                <p className="text-slate-500 text-sm leading-relaxed mb-6 line-clamp-3 flex-1">
+                  {course.desc}
+                </p>
+
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {course.level && (
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-blue-50 text-blue-700 px-3 py-1 rounded-full">
+                      {course.level}
+                    </span>
+                  )}
+                  {course.duration && (
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-orange-50 text-orange-600 px-3 py-1 rounded-full">
+                      {course.duration}
+                    </span>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setSelectedCourse(course)}
+                  className="mt-auto w-full py-3 rounded-2xl bg-gradient-to-r from-[#001f3f] to-[#003366] text-white text-xs font-black uppercase tracking-widest hover:from-orange-500 hover:to-orange-600 transition-all duration-300 shadow-md hover:shadow-orange-200"
+                >
+                  Learn More →
                 </button>
-                <div className="absolute top-0 right-0 w-12 h-12 bg-gray-50 rounded-bl-full group-hover:bg-orange-50 transition-colors"></div>
               </div>
             ))
           )}
         </div>
+
       </div>
 
-      {/* --- COURSE DETAIL MODAL --- */}
       {selectedCourse && (
         <div className="fixed inset-0 z-[999] flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-[#001f3f]/90 backdrop-blur-md" onClick={() => setSelectedCourse(null)}></div>
-          <div className="bg-white rounded-[2.5rem] max-w-2xl w-full p-8 md:p-12 relative z-[1000] shadow-2xl">
-            <button onClick={() => setSelectedCourse(null)} className="absolute top-6 right-6 text-gray-400 hover:text-orange-600 transition-all hover:rotate-90">
-              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <div
+            className="absolute inset-0 bg-[#001f3f]/80 backdrop-blur-md"
+            onClick={() => setSelectedCourse(null)}
+          ></div>
+
+          <div className="bg-white rounded-[2rem] max-w-2xl w-full p-8 md:p-10 relative z-[1000] shadow-2xl max-h-[90vh] overflow-y-auto">
+
+            <button
+              onClick={() => setSelectedCourse(null)}
+              className="absolute top-5 right-5 w-10 h-10 rounded-full bg-slate-100 hover:bg-orange-100 hover:text-orange-600 text-slate-400 flex items-center justify-center transition-all hover:rotate-90 duration-300"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
-            <div className={`w-20 h-20 rounded-3xl bg-gradient-to-br ${selectedCourse.color} text-white flex items-center justify-center text-4xl mb-8 shadow-xl`}>
+
+            <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${selectedCourse.color || 'from-teal-400 to-teal-600'} rounded-t-[2rem]`}></div>
+
+            <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${selectedCourse.color || 'from-teal-500 to-teal-700'} text-white flex items-center justify-center text-3xl mb-6 shadow-xl`}>
               {IconDictionary[selectedCourse.iconKey] || <FaBookOpen />}
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-[#001f3f] mb-4 leading-tight">{selectedCourse.title}</h2>
-            <div className="h-1.5 w-16 bg-orange-500 rounded-full mb-8"></div>
-            
-            {/* 🚀 FIXED TEXT WRAPPING HERE: Added break classes to secure any continuous test strings */}
-            <p className="text-gray-600 text-lg leading-relaxed mb-4 font-medium border-l-4 border-gray-100 pl-6 break-all [word-break:break-word] [overflow-wrap:anywhere]">
+
+            <h2 className="text-3xl font-black text-[#001f3f] mb-2 leading-tight">
+              {selectedCourse.title}
+            </h2>
+            <div className="h-1 w-12 bg-orange-500 rounded-full mb-6"></div>
+
+            <div className="flex flex-wrap gap-2 mb-6">
+              {selectedCourse.level && (
+                <span className="text-xs font-black uppercase tracking-wider bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full">
+                  {selectedCourse.level}
+                </span>
+              )}
+              {selectedCourse.duration && (
+                <span className="text-xs font-black uppercase tracking-wider bg-orange-50 text-orange-600 px-4 py-1.5 rounded-full">
+                  {selectedCourse.duration}
+                </span>
+              )}
+            </div>
+
+            <p className="text-slate-600 text-base leading-relaxed mb-8 font-medium border-l-4 border-orange-200 pl-5 break-words">
               {selectedCourse.detail}
             </p>
-            
-            <div className="mb-8 pl-6 text-sm text-gray-400 font-bold uppercase tracking-wider">Level: {selectedCourse.level} · Duration: {selectedCourse.duration}</div>
+
             <div className="flex flex-wrap gap-4">
-              <a href="https://wa.me/923485654503" target="_blank" rel="noreferrer" className="bg-[#25D366] text-white px-10 py-5 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-xl hover:-translate-y-1 transition-all flex items-center gap-3">
-                Enroll Now <FaWhatsapp size={20} />
+              <a
+                href="https://wa.me/923485654503"
+                target="_blank"
+                rel="noreferrer"
+                className="flex-1 min-w-[140px] bg-[#25D366] text-white px-6 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-green-200 transition-all flex items-center justify-center gap-2"
+              >
+                Enroll Now <FaWhatsapp size={18} />
               </a>
-              <button onClick={() => setSelectedCourse(null)} className="bg-gray-100 text-[#001f3f] px-10 py-5 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-gray-200 transition-all">Go Back</button>
+              <button
+                onClick={() => setSelectedCourse(null)}
+                className="flex-1 min-w-[140px] bg-slate-100 text-[#001f3f] px-6 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-200 transition-all"
+              >
+                Go Back
+              </button>
             </div>
+
           </div>
         </div>
       )}
+
     </section>
   );
 };

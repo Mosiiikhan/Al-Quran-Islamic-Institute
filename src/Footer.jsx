@@ -59,22 +59,22 @@ const Footer = () => {
               A premier global platform for authentic Quranic education. Join thousands of students learning with Tajweed and Tarteel from 4+ years.
             </p>
             
-            {/* Social Media Links */}
-            <div className="flex gap-4">
-              <a href="https://www.facebook.com/share/1DQ27HhzLn/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-blue-600 transition-all hover:-translate-y-1">
-                <FaFacebookF size={16} />
+            {/* Social Media Links - Unique brand-colored circles */}
+            <div className="flex flex-wrap gap-3">
+              <a href="https://www.facebook.com/share/1DQ27HhzLn/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center shadow-md ring-1 ring-white/15 hover:ring-white/40 hover:scale-110 hover:-translate-y-1 transition-all duration-200">
+                <FaFacebookF className="text-white" size={16} />
               </a>
-              <a href="https://www.instagram.com/_al__quran_6?igsh=MWhyMm9sbWpzYmJhbg==" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-pink-600 transition-all hover:-translate-y-1">
-                <FaInstagram size={16} />
+              <a href="https://www.instagram.com/_al__quran_6?igsh=MWhyMm9sbWpzYmJhbg==" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gradient-to-br from-[#feda75] via-[#d62976] to-[#4f5bd5] flex items-center justify-center shadow-md ring-1 ring-white/15 hover:ring-white/40 hover:scale-110 hover:-translate-y-1 transition-all duration-200">
+                <FaInstagram className="text-white" size={16} />
               </a>
-              <a href="https://youtube.com/@quranic.927?si=7t5k0yOg8Pql56dB" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-600 transition-all hover:-translate-y-1">
-                <FaYoutube size={16} />
+              <a href="https://youtube.com/@quranic.927?si=7t5k0yOg8Pql56dB" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#FF0000] flex items-center justify-center shadow-md ring-1 ring-white/15 hover:ring-white/40 hover:scale-110 hover:-translate-y-1 transition-all duration-200">
+                <FaYoutube className="text-white" size={16} />
               </a>
-              <a href="https://www.tiktok.com/@quranic.a?_r=1&_t=ZS-93oPmOHesan" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-black transition-all hover:-translate-y-1">
-                <FaTiktok size={16} />
+              <a href="https://www.tiktok.com/@quranic.a?_r=1&_t=ZS-93oPmOHesan" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-black border border-white/20 flex items-center justify-center shadow-md ring-1 ring-white/15 hover:ring-white/40 hover:scale-110 hover:-translate-y-1 transition-all duration-200">
+                <FaTiktok className="text-white" size={16} />
               </a>
-              <a href="https://www.linkedin.com/in/sundas-ishfaq-105503298?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-blue-700 transition-all hover:-translate-y-1">
-                <FaLinkedinIn size={16} />
+              <a href="https://www.linkedin.com/in/sundas-ishfaq-105503298?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#0A66C2] flex items-center justify-center shadow-md ring-1 ring-white/15 hover:ring-white/40 hover:scale-110 hover:-translate-y-1 transition-all duration-200">
+                <FaLinkedinIn className="text-white" size={16} />
               </a>
             </div>
           </div>

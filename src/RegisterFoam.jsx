@@ -119,33 +119,48 @@ const FloatingRegister = () => {
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className="fixed bottom-24 right-6 bg-orange-600 text-white px-6 py-3 rounded-full shadow-2xl z-[90] flex items-center gap-2 font-black uppercase text-[10px] tracking-widest hover:bg-orange-700 hover:scale-110 transition-all animate-pulse border-2 border-white/20">
-        <FaUserPlus size={16} /><span>Register Free Trial</span>
+      <button 
+        onClick={() => setIsOpen(true)} 
+        className="fixed bottom-20 right-4 md:bottom-24 md:right-6 bg-orange-600 text-white px-4 md:px-6 py-3 rounded-full shadow-2xl z-[90] flex items-center gap-2 font-black uppercase text-[9px] md:text-[10px] tracking-widest hover:bg-orange-700 hover:scale-110 transition-all animate-pulse border-2 border-white/20"
+      >
+        <FaUserPlus size={16} /><span className="hidden sm:inline">Register Free Trial</span><span className="sm:hidden">Register</span>
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 bg-[#001f3f]/80 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto shadow-2xl relative p-6 md:p-8 scrollbar-hide">
-            <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition-colors bg-white rounded-full p-1"><FaTimes size={20} /></button>
-
+        <div className="fixed inset-0 bg-[#001f3f]/85 backdrop-blur-sm z-[200] flex items-center justify-center p-2 sm:p-4">
+          <div className="bg-white rounded-2xl sm:rounded-3xl w-full max-w-xl max-h-[95vh] overflow-y-auto shadow-2xl relative p-5 sm:p-6 md:p-8 scrollbar-hide">
+<button 
+  onClick={handleClose} 
+  className="absolute top-3 right-3 sm:top-4 sm:right-4 w-9 h-9 flex items-center justify-center text-white bg-[#001f3f] hover:bg-red-500 rounded-full transition-all duration-200 hover:rotate-90 shadow-md z-10"
+>
+  <FaTimes size={15} />
+</button>
             {!isSubmitted ? (
               <>
-                <div className="text-center mb-6">
-                  <h2 className="text-xl md:text-2xl font-black text-[#001f3f] uppercase tracking-tight">Start Free Trial</h2>
-                  <p className="text-orange-600 text-[10px] font-bold uppercase tracking-widest mt-1">Quran Azeem Professional Flow</p>
+                <div className="text-center mb-6 pt-2">
+                  <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                    <FaUserPlus className="text-orange-600" size={22} />
+                  </div>
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#001f3f] uppercase tracking-tight">Start Free Trial</h2>
+                  <p className="text-orange-600 text-[9px] sm:text-[10px] font-bold uppercase tracking-widest mt-1">Quran Azeem Professional Flow</p>
                 </div>
 
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
-                    <p className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Step 1: Parent Contact Info</p>
+                <form className="space-y-5" onSubmit={handleSubmit}>
+                  {/* Step 1 */}
+                  <div className="bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-100 space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-[#001f3f] text-white text-[10px] font-black flex items-center justify-center flex-shrink-0">1</span>
+                      <p className="text-[10px] font-black uppercase text-gray-500 tracking-wider">Parent Contact Info</p>
+                    </div>
+
                     <div className="relative">
-                      <FaUser className="absolute top-3.5 left-3 text-gray-400 text-sm" />
-                      <input type="text" name="parentName" required value={parentData.parentName} placeholder="Parent Full Name" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-700" />
+                      <FaUser className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-sm" />
+                      <input type="text" name="parentName" required value={parentData.parentName} placeholder="Parent Full Name" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-700 transition-all" />
                     </div>
 
                     <div className="flex gap-2">
-                      <div className="w-28 relative flex-shrink-0">
-                        <input list="modal-form-country-codes" name="countryCode" value={parentData.countryCode} onChange={handleParentChange} placeholder="+44" className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-700 text-center" />
+                      <div className="w-24 sm:w-28 relative flex-shrink-0">
+                        <input list="modal-form-country-codes" name="countryCode" value={parentData.countryCode} onChange={handleParentChange} placeholder="+44" className="w-full p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-700 text-center transition-all" />
                         <datalist id="modal-form-country-codes">
                           {countryCodesList.map((country, idx) => (
                             <option key={idx} value={country.code}>{country.name} ({country.code})</option>
@@ -153,20 +168,20 @@ const FloatingRegister = () => {
                         </datalist>
                       </div>
                       <div className="relative flex-1">
-                        <FaWhatsapp className="absolute top-3.5 left-3 text-gray-400 text-sm" />
-                        <input type="tel" name="whatsapp" value={parentData.whatsapp} placeholder="WhatsApp No (Optional)" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-700" />
+                        <FaWhatsapp className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-sm" />
+                        <input type="tel" name="whatsapp" value={parentData.whatsapp} placeholder="WhatsApp No (Optional)" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-700 transition-all" />
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="relative">
-                        <FaEnvelope className="absolute top-3.5 left-3 text-gray-400 text-sm" />
-                        <input type="email" name="email" value={parentData.email} placeholder="Email Address *" required onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-700" />
+                        <FaEnvelope className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-sm" />
+                        <input type="email" name="email" value={parentData.email} placeholder="Email Address *" required onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-700 transition-all" />
                       </div>
                       
                       {/* 🚀 SMART HYBRID SELECTOR FOR COUNTRY INSIDE MODAL */}
                       <div className="relative">
-                        <FaGlobe className="absolute top-3.5 left-3 text-gray-400 text-sm" />
+                        <FaGlobe className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-sm" />
                         <input 
                           type="text" 
                           name="country" 
@@ -175,7 +190,7 @@ const FloatingRegister = () => {
                           value={parentData.country} 
                           placeholder="Country (e.g. USA, UK)" 
                           onChange={handleParentChange} 
-                          className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-700" 
+                          className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-700 transition-all" 
                         />
                         <datalist id="modal-countries-datalist">
                           {countryNamesList.map((cName, idx) => (
@@ -185,67 +200,90 @@ const FloatingRegister = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="relative">
-                        <FaGlobe className="absolute top-3.5 left-3 text-gray-400 text-sm" />
-                        <input type="text" name="timezone" required value={parentData.timezone} placeholder="Timezone (e.g. EST, GMT)" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-700" />
+                        <FaGlobe className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-sm" />
+                        <input type="text" name="timezone" required value={parentData.timezone} placeholder="Timezone (e.g. EST, GMT)" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-700 transition-all" />
                       </div>
                       <div className="relative">
-                        <FaClock className="absolute top-3.5 left-3 text-gray-400 text-sm" />
-                        <input type="text" name="preferredTimeSlot" required value={parentData.preferredTimeSlot} placeholder="Preferred Class Time (e.g. 6 PM)" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-700" />
+                        <FaClock className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-sm" />
+                        <input type="text" name="preferredTimeSlot" required value={parentData.preferredTimeSlot} placeholder="Preferred Class Time (e.g. 6 PM)" onChange={handleParentChange} className="w-full pl-10 p-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-700 transition-all" />
                       </div>
                     </div>
                   </div>
 
                   {/* Step 2: Students details */}
-                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <p className="text-[10px] font-black uppercase text-gray-400 tracking-wider">Step 2: Students Details</p>
-                      <button type="button" onClick={addStudentRow} className="bg-orange-600 hover:bg-orange-700 text-white text-[10px] font-black px-3 py-1.5 rounded-lg flex items-center gap-1 uppercase tracking-wider transition-all"><FaPlus size={10} /> Add Student</button>
+                  <div className="bg-gray-50 p-4 sm:p-5 rounded-2xl border border-gray-100 space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-[#001f3f] text-white text-[10px] font-black flex items-center justify-center flex-shrink-0">2</span>
+                      <p className="text-[10px] font-black uppercase text-gray-500 tracking-wider">Students Details</p>
                     </div>
+
                     {students.map((student, index) => (
-                      <div key={index} className="bg-white p-3 rounded-xl border border-gray-200 flex flex-col md:flex-row gap-2 items-center relative">
+                      <div key={index} className="bg-white p-3 rounded-xl border border-gray-200 flex flex-col sm:flex-row gap-2 sm:items-center relative">
                         <div className="relative flex-1 w-full">
-                          <FaChild className="absolute top-3 left-3 text-gray-400 text-xs" />
-                          <input type="text" name="studentName" required value={student.studentName} placeholder={`Student #${index + 1} Name`} onChange={(e) => handleStudentChange(index, e)} className="w-full pl-8 p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none" />
+                          <FaChild className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-xs" />
+                          <input type="text" name="studentName" required value={student.studentName} placeholder={`Student #${index + 1} Name`} onChange={(e) => handleStudentChange(index, e)} className="w-full pl-8 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-orange-400 transition-all" />
                         </div>
-                        <div className="w-full md:w-24">
-                          <input type="number" name="age" required value={student.age} placeholder="Age" onChange={(e) => handleStudentChange(index, e)} className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none" />
-                        </div>
-                        <div className="w-full md:w-36">
-                          <select name="gender" required value={student.gender} onChange={(e) => handleStudentChange(index, e)} className="w-full p-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-500 cursor-pointer focus:outline-none">
-                            <option value="">Select Gender</option><option value="Male">Male</option><option value="Female">Female</option>
+                        <div className="flex gap-2 w-full sm:w-auto">
+                          <input type="number" name="age" required value={student.age} placeholder="Age" onChange={(e) => handleStudentChange(index, e)} className="w-1/2 sm:w-20 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-700 focus:outline-none focus:border-orange-400 transition-all" />
+                          <select name="gender" required value={student.gender} onChange={(e) => handleStudentChange(index, e)} className="w-1/2 sm:w-32 p-2.5 bg-gray-50 border border-gray-200 rounded-lg text-xs font-bold text-gray-500 cursor-pointer focus:outline-none focus:border-orange-400 transition-all">
+                            <option value="">Gender</option><option value="Male">Male</option><option value="Female">Female</option>
                           </select>
+                          {students.length > 1 && (
+                            <button type="button" onClick={() => removeStudentRow(index)} className="text-red-500 hover:text-red-700 px-2.5 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors flex-shrink-0">
+                              <FaTrash size={12} />
+                            </button>
+                          )}
                         </div>
-                        {students.length > 1 && (
-                          <button type="button" onClick={() => removeStudentRow(index)} className="text-red-500 hover:text-red-700 p-2 rounded-lg bg-red-50 hover:bg-red-100 self-stretch flex items-center justify-center transition-colors"><FaTrash size={12} /></button>
-                        )}
                       </div>
                     ))}
+
+                    {/* 🚀 Clear, self-explanatory Add Student button */}
+                    <button 
+                      type="button" 
+                      onClick={addStudentRow} 
+                      className="w-full bg-orange-50 hover:bg-orange-100 border-2 border-dashed border-orange-300 hover:border-orange-400 text-orange-600 text-xs font-black px-4 py-3 rounded-xl flex items-center justify-center gap-2 uppercase tracking-wider transition-all active:scale-95"
+                    >
+                      <FaPlus size={12} /> Add Another Student / Child
+                    </button>
                   </div>
 
-                  <div className="relative">
-                    <FaBookOpen className="absolute top-3.5 left-3 text-gray-400 text-sm" />
-                    <select name="course" required value={parentData.course} onChange={handleParentChange} className="w-full pl-10 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-bold text-gray-500 cursor-pointer appearance-none">
-                      <option value="">Select Target Course</option><option value="Noorani Qaida">Noorani Qaida (Beginners)</option><option value="Quran Reading">Quran Reading (Nazra)</option><option value="Tajweed Course">Tajweed Course</option><option value="Hifz-e-Quran">Hifz-e-Quran</option><option value="Islamic Studies">Islamic Studies</option>
-                    </select>
-                  </div>
-                  <div className="relative">
-                    <FaCommentDots className="absolute top-3.5 left-3 text-gray-400 text-sm" />
-                    <textarea name="description" value={parentData.description} rows="2" placeholder="Any special requests..." onChange={handleParentChange} className="w-full pl-10 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 text-xs font-medium text-gray-700 resize-none"></textarea>
+                  {/* Step 3: Course & notes */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-[#001f3f] text-white text-[10px] font-black flex items-center justify-center flex-shrink-0">3</span>
+                      <p className="text-[10px] font-black uppercase text-gray-500 tracking-wider">Course & Notes</p>
+                    </div>
+                    <div className="relative">
+                      <FaBookOpen className="absolute top-1/2 -translate-y-1/2 left-3 text-gray-400 text-sm" />
+                      <select name="course" required value={parentData.course} onChange={handleParentChange} className="w-full pl-10 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-bold text-gray-500 cursor-pointer appearance-none transition-all">
+                        <option value="">Select Target Course</option><option value="Noorani Qaida">Noorani Qaida (Beginners)</option><option value="Quran Reading">Quran Reading (Nazra)</option><option value="Tajweed Course">Tajweed Course</option><option value="Hifz-e-Quran">Hifz-e-Quran</option><option value="Islamic Studies">Islamic Studies</option>
+                      </select>
+                    </div>
+                    <div className="relative">
+                      <FaCommentDots className="absolute top-3.5 left-3 text-gray-400 text-sm" />
+                      <textarea name="description" value={parentData.description} rows="2" placeholder="Any special requests..." onChange={handleParentChange} className="w-full pl-10 p-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-100 text-xs font-medium text-gray-700 resize-none transition-all"></textarea>
+                    </div>
                   </div>
 
-                  <button type="submit" className="w-full bg-[#001f3f] text-white font-black py-4 rounded-xl uppercase tracking-widest text-[10px] hover:bg-orange-600 transition-all active:scale-95 shadow-xl flex items-center justify-center gap-2">Submit Application</button>
+                  <button type="submit" className="w-full bg-[#001f3f] text-white font-black py-4 rounded-xl uppercase tracking-widest text-[10px] hover:bg-orange-600 transition-all active:scale-95 shadow-xl flex items-center justify-center gap-2">
+                    Submit Application
+                  </button>
                 </form>
               </>
             ) : (
-              <div className="text-center py-8">
+              <div className="text-center py-6 sm:py-8">
                 <FaCheckCircle className="text-green-500 mx-auto mb-4 animate-bounce" size={54} />
-                <h2 className="text-xl md:text-2xl font-black text-[#001f3f] uppercase tracking-tight">Thanks For Registering!</h2>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#001f3f] uppercase tracking-tight">Thanks For Registering!</h2>
                 <p className="text-gray-500 text-xs font-medium mt-2 max-w-sm mx-auto leading-relaxed">Your details have been successfully recorded in our dashboard.</p>
                 <div className="mt-8 space-y-3">
-                  <button onClick={handleWhatsAppRedirect} className="w-full bg-[#16a34a] text-white font-black py-3 rounded-xl uppercase tracking-widest text-[10px] hover:bg-green-700 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-md"><FaWhatsapp size={16} /> Also Send on WhatsApp (Optional)</button>
-                  <button onClick={handleClose} className="w-full bg-gray-100 text-gray-600 font-bold py-3 rounded-xl text-[10px] uppercase tracking-widest hover:bg-gray-200 transition-all active:scale-95">Close Window</button>
+                  <button onClick={handleWhatsAppRedirect} className="w-full bg-[#16a34a] text-white font-black py-3 rounded-xl uppercase tracking-widest text-[10px] hover:bg-green-700 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-md">
+                    <FaWhatsapp size={16} /> Also Send on WhatsApp (Optional)
+                  </button>
+                  <button onClick={handleClose} className="w-full bg-gray-100 text-gray-600 font-bold py-3 rounded-xl text-[10px] uppercase tracking-widest hover:bg-gray-200 transition-all active:scale-95">
+                    Close Window
+                  </button>
                 </div>
               </div>
             )}

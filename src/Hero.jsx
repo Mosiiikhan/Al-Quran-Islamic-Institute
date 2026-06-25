@@ -1,47 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import kabba from './assets/kabba.jpg';
+import child from './assets/child.jpeg.webp';
+
+
 
 const Hero = () => {
-  const slides = [
+
+
+const slides = [
     {
       id: 1,
-      // Khana Kaba / Masjid-al-Haram Image
       image: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?q=80&w=1600",
-      eyebrow: "Spiritual Excellence",
-      title: "Experience of",
-      highlight: "The Holy Quran",
-      desc: "Embark on a divine journey of learning from the comfort of your home with our specialized Tajweed programs."
+      eyebrow: "🕌 Where Every Journey Begins",
+      title: "Learn Quran with",
+      highlight: "Tajweed & Tarteel",
+      desc: "Begin your child's sacred journey with certified tutors who teach with patience, wisdom, and the love of Allah ﷻ."
     },
     {
       id: 2,
-      // Student / Teacher Learning Environment
-      image: "https://images.unsplash.com/photo-1584285418504-00550091298c?q=80&w=1600",
-      eyebrow: "Personalized Coaching",
-      title: "1-on-1 Interactive",
-      highlight: "Quranic Sessions",
-      desc: "Our expert tutors ensure personalized attention for kids and adults, making learning easy and effective."
+      image: kabba,
+      eyebrow: "🕋 Facing the Qibla of Knowledge",
+      title: "Online Classes",
+      highlight: "Inspired by the Sunnah",
+      desc: "Every lesson is rooted in Islamic values — connecting your child to the Quran the way it was meant to be learned."
     },
     {
       id: 3,
-      // Holy Quran Close-up
       image: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=1600",
-      eyebrow: "Global Reach",
-      title: "Trusted by Families",
-      highlight: "In USA, UK & Canada",
-      desc: "Join thousands of global students who have mastered Quranic recitation through our tech-driven platform."
+      eyebrow: "📖 Trusted by 5000+ Families",
+      title: "Mastering the Words of",
+      highlight: "Allah ﷻ Since 2018",
+      desc: "Families across USA, UK & Canada trust us to give their children the greatest gift — the Holy Quran in their hearts."
     },
     {
       id: 4,
-      // Beautiful Mosque Architecture
-      image: "https://images.unsplash.com/photo-1542810634-7bc209e056d9?q=80&w=1600",
-      eyebrow: "Professional Management",
-      title: "Managed by Expert",
-      highlight: "Software Engineers",
-      desc: "Combining Islamic values with professional discipline to provide a premium online learning experience."
+      image: child,
+      eyebrow: "👨‍🏫 Certified & Qualified Tutors",
+      title: "Your Child Deserves",
+      highlight: "The Best Quran Teacher",
+      desc: "Our male & female tutors are Hafiz-e-Quran with ijazah — ensuring authentic, safe, and effective learning for your child."
     }
   ];
-
   const [current, setCurrent] = useState(0);
 
   // Auto-play logic
