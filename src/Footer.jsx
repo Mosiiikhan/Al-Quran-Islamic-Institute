@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // 🚀 Added Link for admin navigation
 import { 
   FaFacebookF, FaInstagram, FaYoutube, FaTiktok, 
   FaLinkedinIn, FaWhatsapp, FaEnvelope, FaMapMarkerAlt 
@@ -59,7 +60,7 @@ const Footer = () => {
               A premier global platform for authentic Quranic education. Join thousands of students learning with Tajweed and Tarteel from 4+ years.
             </p>
             
-            {/* Social Media Links - Unique brand-colored circles */}
+            {/* Social Media Links */}
             <div className="flex flex-wrap gap-3">
               <a href="https://www.facebook.com/share/1DQ27HhzLn/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center shadow-md ring-1 ring-white/15 hover:ring-white/40 hover:scale-110 hover:-translate-y-1 transition-all duration-200">
                 <FaFacebookF className="text-white" size={16} />
@@ -79,33 +80,24 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Column 2: Quick Links (UPDATED WITH SCROLL LOGIC) */}
+          {/* Column 2: Quick Links */}
           <div>
             <h3 className="text-sm font-black uppercase tracking-[0.3em] text-orange-500 mb-8 border-l-4 border-orange-500 pl-4">
               Explore
             </h3>
             <ul className="space-y-4 text-gray-400 text-sm font-bold">
-              
-              {/* Home Link */}
               <li onClick={scrollToTop} className="hover:text-white cursor-pointer transition-colors flex items-center gap-2">
                 <span className="text-orange-500">›</span> Home
               </li>
-
-              {/* Courses Link */}
               <li onClick={() => scrollToSection('courses-section')} className="hover:text-white cursor-pointer transition-colors flex items-center gap-2">
                 <span className="text-orange-500">›</span> Our Courses
               </li>
-
-              {/* Fee Structure Link */}
               <li onClick={() => scrollToSection('fee-section')} className="hover:text-white cursor-pointer transition-colors flex items-center gap-2">
                 <span className="text-orange-500">›</span> Fee Structure
               </li>
-
-              {/* About Academy Link */}
               <li onClick={() => scrollToSection('about-academy')} className="hover:text-white cursor-pointer transition-colors flex items-center gap-2">
                 <span className="text-orange-500">›</span> About Academy
               </li>
-
             </ul>
           </div>
 
@@ -152,9 +144,18 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-gray-500 text-[10px] font-bold tracking-[0.3em] uppercase">
           <p>© 2026 Al Quran Islamic Institute. All Rights Reserved.</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
+          <div className="flex gap-6 mt-4 md:mt-0 items-center">
             <span className="hover:text-white cursor-pointer transition-colors">Privacy Policy</span>
+             <Link 
+              to="/admin/login" 
+              className="hover:text-orange-400 text-gray-500 cursor-pointer transition-colors"
+            >
+              Staff Portal
+            </Link>
             <span className="hover:text-white cursor-pointer transition-colors">Terms of Service</span>
+            
+           
+           
           </div>
         </div>
       </div>

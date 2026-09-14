@@ -1,9 +1,40 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios'; 
+import { useNavigate } from 'react-router-dom';
 
 import StudentsModule from './StudentsModule';
-import CoursesModule from './CoursesModule'; // 🚀 Connected cleanly inside same directory
+import CoursesModule from './CoursesModule'; 
 import InquiriesModule from "./InquiriesModule";
+import AdminAddBlog from './AdminAddBlog'; 
+import SecurityDashboard from './SecurityDashboard'; // 🛡️ Banned IPs & Threat Shield Module
+
+// ─── Centralized Axios Instance with Auto-Token & 401 Guard ─────────────────
+const api = axios.create({
+  baseURL: 'http://localhost:5000/api'
+});
+
+api.interceptors.request.use(
+  (config) => {
+    const token = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      sessionStorage.removeItem('adminToken');
+      localStorage.removeItem('adminToken');
+      window.location.replace('/admin/login');
+    }
+    return Promise.reject(error);
+  }
+);
 
 // ─── Icons Configuration Master Object ───────────────────────────────────────
 const Icon = ({ d, size = 16 }) => (
@@ -27,68 +58,88 @@ const Icons = {
   bell:      "M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9 M13.73 21a2 2 0 0 1-3.46 0",
   plus:      "M12 5v14 M5 12h14",
   wallet:    "M21 12V7H5a2 2 0 0 1 0-4h14v4 M3 5v14a2 2 0 0 0 2 2h16v-5 M18 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4z",
+  crescent:  "M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z",
+  blog:      "M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z",
+  lock:      "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
+  shield:    "M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" // 🛡️ Threat Shield Icon
 };
-
-const API_BASE_URL = 'http://localhost:5000/api/admin';
 
 // ─── Design Tokens & Global Styles ──────────────────────────────────────────
 const T = {
-  ink: "#0c1f1c", inkSoft: "rgba(212,231,224,0.62)", accent: "#0f766e", accentSoft: "#ecfdf5", gold: "#b8860b", amber: "#c2410c", amberBg: "#fff7ed", amberBd: "#fed7aa", green: "#15803d", greenBg: "#f0fdf4", greenBd: "#bbf7d0", violet: "#6d28d9", violetBg: "#faf5ff", violetBd: "#ddd6fe", ink2: "#0f172a", sub: "#64748b", faint: "#94a3b8", bg: "#f6f7f5", card: "#ffffff"
+  ink: "#0a1830", inkSoft: "rgba(226,232,240,0.55)", inkBorder: "rgba(255,255,255,0.07)",
+  accent: "#c2410c", accentSoft: "#fff7ed", accentBd: "#fed7aa",
+  gold: "#b8860b", goldSoft: "#fdf6e3",
+  amber: "#c2410c", amberBg: "#fff7ed", amberBd: "#fed7aa",
+  green: "#15803d", greenBg: "#f0fdf4", greenBd: "#bbf7d0",
+  violet: "#6d28d9", violetBg: "#faf5ff", violetBd: "#ddd6fe",
+  teal: "#0f766e", tealBg: "#ecfdf5", tealBd: "#99f6e4",
+  ink2: "#0f172a", sub: "#64748b", faint: "#94a3b8",
+  bg: "#f4f5f7", card: "#ffffff", line: "#e7eaee",
 };
 
 const S = {
   root:       { display: 'flex', height: '100vh', fontFamily: "'Inter', sans-serif", background: T.bg, color: T.ink2, overflow: 'hidden' },
-  sidebar:    { width: 220, minWidth: 220, background: T.ink, display: 'flex', flexDirection: 'column', height: '100vh', position: 'sticky', top: 0 },
+  sidebar:    { width: 232, minWidth: 232, background: `linear-gradient(180deg, ${T.ink} 0%, #0c1f3f 100%)`, display: 'flex', flexDirection: 'column', height: '100vh', position: 'sticky', top: 0, boxShadow: '4px 0 24px rgba(0,0,0,0.12)' },
   main:       { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' },
-  content:    { flex: 1, overflowY: 'auto', padding: '24px 28px', background: T.bg },
-  logoRow:    { padding: '20px 20px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: 10 },
-  pulse:      { width: 8, height: 8, borderRadius: '50%', background: '#2dd4bf', boxShadow: '0 0 0 3px rgba(45,212,191,0.18)' },
-  logoText:   { fontSize: 11, fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)' },
-  nav:        { padding: '14px 10px', flex: 1 },
-  navBtnBase: { width: '100%', background: 'none', border: 'none', color: T.inkSoft, fontSize: 12, fontWeight: 500, letterSpacing: '0.06em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 8, cursor: 'pointer', marginBottom: 4 },
-  navActive:  { background: T.accent, color: '#fff' },
-  logoutArea: { padding: '12px 10px', borderTop: '0.5px solid rgba(255,255,255,0.08)' },
-  logoutBtn:  { width: '100%', background: 'none', border: 'none', color: '#f87171', fontSize: 12, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 8, cursor: 'pointer' },
-  topbar:     { background: T.card, borderBottom: '0.5px solid #e2e8f0', height: 58, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', padding: '0 28px', gap: 14 },
-  userInfo:   { textAlign: 'right' }, userName: { fontSize: 13, fontWeight: 500 }, userRole: { fontSize: 10, color: T.faint },
-  avatar:     { width: 36, height: 36, borderRadius: 8, background: T.accentSoft, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 600, color: T.accent, border: '0.5px solid #99f6e4' },
-  pageTitle:  { fontSize: 20, fontWeight: 600, marginBottom: 4 }, pageSub: { fontSize: 13, color: T.sub, marginBottom: 20 },
-  statsGrid:  { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 20 },
-  statCard:   { background: T.card, border: '0.5px solid #e2e8f0', borderRadius: 12, padding: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative' },
-  statLabel:  { fontSize: 11, fontWeight: 500, color: T.faint, marginBottom: 6 }, statValue: { fontSize: 26, fontWeight: 600, lineHeight: 1 },
-  tableCard:  { background: T.card, border: '0.5px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' },
-  tableHead:  { padding: '14px 20px', borderBottom: '0.5px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
-  tableTitle: { fontSize: 14, fontWeight: 600 }, viewAll: { fontSize: 11, fontWeight: 600, color: T.accent, background: 'none', border: 'none', cursor: 'pointer' },
+  content:    { flex: 1, overflowY: 'auto', padding: '26px 30px 40px', background: T.bg },
+  logoRow:    { padding: '22px 22px 18px', borderBottom: `0.5px solid ${T.inkBorder}`, display: 'flex', alignItems: 'center', gap: 10 },
+  logoBadge:  { width: 34, height: 34, borderRadius: 10, background: 'rgba(184,134,11,0.18)', border: '0.5px solid rgba(184,134,11,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.gold, flexShrink: 0 },
+  logoText:   { fontSize: 12, fontWeight: 600, letterSpacing: '0.06em', color: '#fff', lineHeight: 1.2 },
+  logoSub:    { fontSize: 9.5, fontWeight: 500, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', marginTop: 2 },
+  navLabel:   { fontSize: 10, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.28)', padding: '18px 16px 8px' },
+  nav:        { padding: '4px 12px', flex: 1 },
+  navBtnBase: { width: '100%', background: 'none', border: 'none', borderLeft: '2.5px solid transparent', color: T.inkSoft, fontSize: 12.5, fontWeight: 500, letterSpacing: '0.02em', display: 'flex', alignItems: 'center', gap: 11, padding: '10px 12px', borderRadius: 8, cursor: 'pointer', marginBottom: 2, transition: 'all 0.15s' },
+  navActive:  { background: 'rgba(255,255,255,0.07)', color: '#fff', borderLeft: `2.5px solid ${T.gold}` },
+  logoutArea: { padding: '14px 14px 18px', borderTop: `0.5px solid ${T.inkBorder}` },
+  logoutBtn:  { width: '100%', background: 'none', border: 'none', color: '#fca5a5', fontSize: 12.5, fontWeight: 500, display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px', borderRadius: 8, cursor: 'pointer', transition: 'background 0.2s' },
+  topbar:     { background: T.card, borderBottom: `0.5px solid ${T.line}`, height: 62, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 28px', gap: 14 },
+  topbarLeft: { display: 'flex', alignItems: 'center', gap: 14 },
+  bellBtn:    { width: 34, height: 34, borderRadius: 9, border: `0.5px solid ${T.line}`, background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: T.sub, cursor: 'pointer', position: 'relative' },
+  bellDot:    { position: 'absolute', top: 7, right: 8, width: 6, height: 6, borderRadius: '50%', background: T.accent, border: '1.5px solid #fff' },
+  userInfo:   { textAlign: 'right' }, userName: { fontSize: 13, fontWeight: 600 }, userRole: { fontSize: 10, color: T.faint, fontWeight: 500 },
+  avatar:     { width: 36, height: 36, borderRadius: 10, background: `linear-gradient(135deg, ${T.ink} 0%, #16335c 100%)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: T.gold, border: '0.5px solid rgba(184,134,11,0.3)' },
+  pageEyebrow:{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: T.accent, marginBottom: 6 },
+  pageTitle:  { fontSize: 21, fontWeight: 700, marginBottom: 4, letterSpacing: '-0.01em' }, pageSub: { fontSize: 13, color: T.sub, marginBottom: 22 },
+  statsGrid:  { display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 22 },
+  statCard:   { background: T.card, border: `0.5px solid ${T.line}`, borderRadius: 14, padding: '18px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' },
+  statLabel:  { fontSize: 11, fontWeight: 600, color: T.faint, marginBottom: 6, letterSpacing: '0.01em' }, statValue: { fontSize: 27, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em' },
+  tableCard:  { background: T.card, border: `0.5px solid ${T.line}`, borderRadius: 14, overflow: 'hidden', boxShadow: '0 1px 2px rgba(15,23,42,0.04)' },
+  tableHead:  { padding: '16px 20px', borderBottom: `0.5px solid ${T.line}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' },
+  tableTitle: { fontSize: 14.5, fontWeight: 700 }, viewAll: { fontSize: 11, fontWeight: 700, color: T.accent, background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.02em' },
 };
 
 // ─── Shared Badges & Helpers ──────────────────────────────────────────────────
 const StatusBadge = ({ status }) => (
-  <span style={{ background: status === 'Pending' ? T.amberBg : T.greenBg, border: `0.5px solid ${status === 'Pending' ? T.amberBd : T.greenBd}`, color: status === 'Pending' ? T.amber : T.green, borderRadius: 6, padding: '2px 8px', fontSize: 10, fontWeight: 600, textTransform: 'uppercase' }}>{status}</span>
+  <span style={{ background: status === 'Pending' ? T.amberBg : T.greenBg, border: `0.5px solid ${status === 'Pending' ? T.amberBd : T.greenBd}`, color: status === 'Pending' ? T.amber : T.green, borderRadius: 999, padding: '3px 10px', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em' }}>{status}</span>
 );
 
 const CountryBadge = ({ country }) => (
-  <span style={{ background: '#f1f5f9', border: '0.5px solid #e2e8f0', borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 500, color: '#475569' }}>{country}</span>
+  <span style={{ background: '#f1f5f9', border: `0.5px solid ${T.line}`, borderRadius: 6, padding: '2px 8px', fontSize: 11, fontWeight: 500, color: '#475569' }}>{country}</span>
 );
 
 const ActionBtn = ({ icon, color, hoverBg, hoverBorder, title, onClick }) => {
   const [hovered, setHovered] = useState(false);
   return (
-    <button title={title} onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ width: 28, height: 28, borderRadius: 7, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginLeft: 4, transition: 'all 0.15s', border: hovered ? `0.5px solid ${hoverBorder}` : '0.5px solid #e2e8f0', background: hovered ? hoverBg : '#ffffff', color: hovered ? color : '#94a3b8' }}><Icon d={Icons[icon]} size={12} /></button>
+    <button title={title} onClick={onClick} onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)} style={{ width: 29, height: 29, borderRadius: 8, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginLeft: 5, transition: 'all 0.15s', border: hovered ? `0.5px solid ${hoverBorder}` : `0.5px solid ${T.line}`, background: hovered ? hoverBg : '#ffffff', color: hovered ? color : '#94a3b8' }}><Icon d={Icons[icon]} size={12} /></button>
   );
 };
 
 const NavBtn = ({ icon, label, active, onClick, badge }) => (
-  <button onClick={onClick} style={{ ...S.navBtnBase, ...(active ? S.navActive : {}) }}><Icon d={Icons[icon]} size={15} /><span style={{ flex: 1, textAlign: 'left' }}>{label}</span>{!!badge && <span style={{ background: active ? 'rgba(255,255,255,0.25)' : T.gold, color: '#fff', borderRadius: 999, fontSize: 10, fontWeight: 700, padding: '1px 6px' }}>{badge}</span>}</button>
+  <button onClick={onClick} style={{ ...S.navBtnBase, ...(active ? S.navActive : {}) }}>
+    <Icon d={Icons[icon]} size={15} />
+    <span style={{ flex: 1, textAlign: 'left' }}>{label}</span>
+    {!!badge && <span style={{ background: active ? T.gold : 'rgba(184,134,11,0.22)', color: active ? '#1a1206' : T.gold, borderRadius: 999, fontSize: 10, fontWeight: 700, padding: '1px 7px' }}>{badge}</span>}
+  </button>
 );
 
 const CrescentRing = ({ color, pct = 70 }) => {
-  const r = 16, c = 2 * Math.PI * r;
-  return (<svg width={44} height={44} viewBox="0 0 44 44" style={{ flexShrink: 0 }}><circle cx="22" cy="22" r={r} fill="none" stroke="#eef2f1" strokeWidth="3" /><circle cx="22" cy="22" r={r} fill="none" stroke={color} strokeWidth="3" strokeDasharray={`${(pct / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 22 22)" /></svg>);
+  const r = 17, c = 2 * Math.PI * r;
+  return (<svg width={46} height={46} viewBox="0 0 46 46" style={{ flexShrink: 0 }}><circle cx="23" cy="23" r={r} fill="none" stroke="#eef1f4" strokeWidth="3.5" /><circle cx="23" cy="23" r={r} fill="none" stroke={color} strokeWidth="3.5" strokeDasharray={`${(pct / 100) * c} ${c}`} strokeLinecap="round" transform="rotate(-90 23 23)" /></svg>);
 };
 
 const StudentsListCell = ({ studentsList }) => {
-  if (!studentsList || studentsList.length === 0) return <span style={{ color: '#94a3b8', fontSize: 11 }}>No students map</span>;
-  return (<div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>{studentsList.map((st, idx) => (<span key={idx} style={{ background: '#f8fafc', padding: '2px 6px', borderRadius: 6, border: '0.5px solid #e2e8f0', fontSize: 11, display: 'inline-block', color: '#334155' }}>👦 <b>{st.studentName}</b> ({st.age} Yrs - {st.gender})</span>))}</div>);
+  if (!studentsList || studentsList.length === 0) return <span style={{ color: '#94a3b8', fontSize: 11 }}>No students mapped</span>;
+  return (<div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>{studentsList.map((st, idx) => (<span key={idx} style={{ background: '#f8fafc', padding: '3px 8px', borderRadius: 6, border: `0.5px solid ${T.line}`, fontSize: 11, display: 'inline-block', color: '#334155' }}><b>{st.studentName}</b> · {st.age} yrs · {st.gender}</span>))}</div>);
 };
 
 // ─── Dashboard Tab Component ───────────────────────────────────────────────────
@@ -96,13 +147,187 @@ const DashboardTab = ({ inquiries, handleApprove, handleDelete, setActiveTab, st
   const safeInquiries = Array.isArray(inquiries) ? inquiries : [];
   return (
     <div>
-      <div style={S.pageTitle}>Welcome back, engineer</div><div style={S.pageSub}>Here is what's happening with Al Quran Institute today.</div>
-      <div style={S.statsGrid}>{stats.map(s => (<div key={s.label} style={S.statCard}><div><div style={S.statLabel}>{s.label}</div><div style={{ ...S.statValue, color: s.color }}>{s.value}</div></div><div style={{ position: 'relative', width: 40, height: 40 }}><CrescentRing color={s.color} pct={s.pct} /><div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}><Icon d={Icons[s.icon]} size={15} /></div></div></div>))}</div>
+      <div style={S.pageEyebrow}>Overview</div>
+      <div style={S.pageTitle}>Welcome back, Mohsin</div>
+      <div style={S.pageSub}>Here's what's happening with Al Quran Institute today.</div>
+
+      <div style={S.statsGrid}>
+        {stats.map(s => (
+          <div key={s.label} style={S.statCard}>
+            <div><div style={S.statLabel}>{s.label}</div><div style={{ ...S.statValue, color: s.color }}>{s.value}</div></div>
+            <div style={{ position: 'relative', width: 42, height: 42 }}>
+              <CrescentRing color={s.color} pct={s.pct} />
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}><Icon d={Icons[s.icon]} size={15} /></div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <div style={S.tableCard}>
-        <div style={S.tableHead}><span style={S.tableTitle}>Recent trial bookings</span><button style={S.viewAll} onClick={() => setActiveTab('inquiries')}>View all →</button></div>
-        <div style={{ overflowX: 'auto' }}><table style={{ width: '100%', borderCollapse: 'collapse' }}><thead><tr style={{ background: '#f8fafc' }}>{['Date / Time', 'Parent Details', 'Contact & Slot', 'Enrolled Students', 'Country', 'Course', 'Status', ''].map((h, i) => (<th key={i} style={{ padding: '10px 16px', fontSize: 10, fontWeight: 600, color: '#94a3b8', borderBottom: '0.5px solid #e2e8f0', textAlign: i === 7 ? 'right' : 'left' }}>{h}</th>))}</tr></thead><tbody>{safeInquiries.length === 0 ? (<tr><td colSpan={8} style={{ padding: 32, textAlign: 'center', color: '#94a3b8' }}>No records.</td></tr>) : safeInquiries.slice(0, 4).map(inq => (
-          <tr key={inq._id} style={{ borderBottom: '0.5px solid #f1f5f9' }}><td style={{ padding: '11px 16px', fontSize: 13 }}><div>{inq.date}</div><div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{inq.time || 'N/A'} <span style={{ color: T.accent, fontWeight: 600 }}>({inq.timezone})</span></div></td><td style={{ padding: '11px 16px', fontSize: 13, fontWeight: 600 }}><div>{inq.parentName}</div><div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 400 }}>{inq.email}</div></td><td style={{ padding: '11px 16px' }}><div style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>{inq.whatsapp}</div><div style={{ fontSize: 10, color: '#64748b' }}>Slot: {inq.preferredTimeSlot}</div></td><td style={{ padding: '11px 16px' }}><StudentsListCell studentsList={inq.students} /></td><td style={{ padding: '11px 16px' }}><CountryBadge country={inq.country} /></td><td style={{ padding: '11px 16px', fontSize: 13 }}>{inq.course}</td><td style={{ padding: '11px 16px' }}><StatusBadge status={inq.status} /></td><td style={{ padding: '11px 16px', textAlign: 'right' }}>{inq.status === 'Pending' && (<ActionBtn icon="check" color="#16a34a" hoverBg="#f0fdf4" hoverBorder="#bbf7d0" onClick={() => handleApprove(inq._id)} />)}<ActionBtn icon="trash" color="#dc2626" hoverBg="#fef2f2" hoverBorder="#fecaca" onClick={() => handleDelete(inq._id)} /></td></tr>
-        ))}</tbody></table></div>
+        <div style={S.tableHead}>
+          <span style={S.tableTitle}>Recent trial bookings</span>
+          <button style={S.viewAll} onClick={() => setActiveTab('inquiries')}>View all →</button>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#fafbfc' }}>
+                {['Date / Time', 'Parent Details', 'Contact & Slot', 'Enrolled Students', 'Country', 'Course', 'Status', ''].map((h, i) => (
+                  <th key={i} style={{ padding: '11px 16px', fontSize: 10, fontWeight: 700, color: T.faint, borderBottom: `0.5px solid ${T.line}`, textAlign: i === 7 ? 'right' : 'left', letterSpacing: '0.03em', textTransform: 'uppercase' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {safeInquiries.length === 0 ? (
+                <tr><td colSpan={8} style={{ padding: 40, textAlign: 'center', color: '#94a3b8', fontSize: 13 }}>No bookings yet — new trial requests will appear here.</td></tr>
+              ) : safeInquiries.slice(0, 4).map(inq => (
+                <tr key={inq._id} style={{ borderBottom: `0.5px solid #f1f5f9`, transition: 'background 0.15s' }} onMouseEnter={e => e.currentTarget.style.background = '#fafbfc'} onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                  <td style={{ padding: '12px 16px', fontSize: 13 }}>
+                    <div style={{ fontWeight: 500 }}>{inq.date}</div>
+                    <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>{inq.time || 'N/A'} <span style={{ color: T.teal, fontWeight: 600 }}>({inq.timezone})</span></div>
+                  </td>
+                  <td style={{ padding: '12px 16px', fontSize: 13, fontWeight: 600 }}>
+                    <div>{inq.parentName}</div>
+                    <div style={{ fontSize: 11, color: '#94a3b8', fontWeight: 400 }}>{inq.email}</div>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ fontSize: 13, color: '#16a34a', fontWeight: 600 }}>{inq.whatsapp}</div>
+                    <div style={{ fontSize: 10, color: '#64748b' }}>Slot: {inq.preferredTimeSlot}</div>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}><StudentsListCell studentsList={inq.students} /></td>
+                  <td style={{ padding: '12px 16px' }}><CountryBadge country={inq.country} /></td>
+                  <td style={{ padding: '12px 16px', fontSize: 13 }}>{inq.course}</td>
+                  <td style={{ padding: '12px 16px' }}><StatusBadge status={inq.status} /></td>
+                  <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                    {inq.status === 'Pending' && (<ActionBtn icon="check" color="#16a34a" hoverBg="#f0fdf4" hoverBorder="#bbf7d0" onClick={() => handleApprove(inq._id)} />)}
+                    <ActionBtn icon="trash" color="#dc2626" hoverBg="#fef2f2" hoverBorder="#fecaca" onClick={() => handleDelete(inq._id)} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Change Password / Security Tab Component ───────────────────────────────
+const SecurityTab = ({ handleLogout }) => {
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({ type: '', message: '' });
+
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    setStatus({ type: '', message: '' });
+
+    if (newPassword !== confirmPassword) {
+      return setStatus({ type: 'error', message: 'New password and confirm password do not match.' });
+    }
+
+    if (newPassword.length < 8) {
+      return setStatus({ type: 'error', message: 'New password must be at least 8 characters long.' });
+    }
+
+    try {
+      setLoading(true);
+      const res = await api.put('/admin-auth/change-password', { currentPassword, newPassword });
+
+      if (res.data.success) {
+        setStatus({ type: 'success', message: 'Password changed successfully! Logging out...' });
+        setTimeout(() => {
+          handleLogout();
+        }, 1500);
+      }
+    } catch (err) {
+      setStatus({ 
+        type: 'error', 
+        message: err.response?.data?.message || 'Failed to change password. Please check your credentials.' 
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: 540 }}>
+      <div style={S.pageEyebrow}>Security Center</div>
+      <div style={S.pageTitle}>Change Password</div>
+      <div style={S.pageSub}>Ensure your portal remains safe by updating your password periodically.</div>
+
+      <div style={{ ...S.tableCard, padding: '28px 24px' }}>
+        {status.message && (
+          <div style={{
+            padding: '12px 14px',
+            borderRadius: 8,
+            fontSize: 12.5,
+            marginBottom: 20,
+            background: status.type === 'error' ? '#fef2f2' : '#f0fdf4',
+            color: status.type === 'error' ? '#991b1b' : '#166534',
+            border: `1px solid ${status.type === 'error' ? '#fecaca' : '#bbf7d0'}`
+          }}>
+            {status.message}
+          </div>
+        )}
+
+        <form onSubmit={handlePasswordSubmit}>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: T.ink2, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Current Password</label>
+            <input 
+              type="password" 
+              required
+              value={currentPassword}
+              onChange={e => setCurrentPassword(e.target.value)}
+              placeholder="Enter existing password"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1px solid ${T.line}`, outline: 'none', fontSize: 13, boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: T.ink2, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>New Password</label>
+            <input 
+              type="password" 
+              required
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              placeholder="At least 8 characters"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1px solid ${T.line}`, outline: 'none', fontSize: 13, boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: T.ink2, marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Confirm New Password</label>
+            <input 
+              type="password" 
+              required
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="Repeat new password"
+              style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1px solid ${T.line}`, outline: 'none', fontSize: 13, boxSizing: 'border-box' }}
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            style={{ 
+              padding: '11px 22px', 
+              borderRadius: 8, 
+              border: 'none', 
+              background: T.accent, 
+              color: '#fff', 
+              fontSize: 12.5, 
+              fontWeight: 600, 
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.7 : 1
+            }}
+          >
+            {loading ? 'Updating Password...' : 'Update Password'}
+          </button>
+        </form>
       </div>
     </div>
   );
@@ -118,144 +343,147 @@ const AdminDashboard = () => {
   const [students, setStudents]       = useState([]); 
   const [loading, setLoading]         = useState(true);
 
-  // 🚀 HARDENED SAFE HANDLING FOR DATA SYNC FROM MONGO ATOMIC CLUSTERS
+  const navigate = useNavigate();
+
+  // 🚪 LOGOUT FUNCTION
+  const handleLogout = () => {
+    sessionStorage.removeItem('adminToken');
+    localStorage.removeItem('adminToken');
+    navigate('/admin/login', { replace: true });
+  };
+
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-
-      // A. Isolated Inquiries Processing Block
       try {
-        const inqRes = await axios.get(`${API_BASE_URL}/inquiries`);
+        const inqRes = await api.get('/admin/inquiries');
         const parsedInq = inqRes.data?.data || inqRes.data || [];
         setInquiries(Array.isArray(parsedInq) ? parsedInq : []);
-      } catch (inqErr) {
-        console.error("Inquiries data loading crash isolated:", inqErr);
-      }
+      } catch (inqErr) { console.error("Inquiries processing fail:", inqErr); }
 
-      // B. Isolated Courses Processing Block
       try {
-        const courseRes = await axios.get(`${API_BASE_URL}/courses`);
+        const courseRes = await api.get('/admin/courses');
         setCourses(courseRes.data?.data || courseRes.data || []);
-      } catch (courseErr) {
-        console.error("Courses data loading crash isolated:", courseErr);
-      }
+      } catch (courseErr) { console.error("Courses processing fail:", courseErr); }
 
-      // C. Isolated Students Processing Block with robust validation parse tracking
       try {
-        const studentRes = await axios.get(`${API_BASE_URL}/students`);
+        const studentRes = await api.get('/admin/students');
         if (studentRes.data) {
-          if (Array.isArray(studentRes.data)) {
-            setStudents(studentRes.data);
-          } else if (studentRes.data.data && Array.isArray(studentRes.data.data)) {
-            setStudents(studentRes.data.data);
-          } else if (studentRes.data.students && Array.isArray(studentRes.data.students)) {
-            setStudents(studentRes.data.students);
-          } else {
-            setStudents([]);
-          }
-        } else {
-          setStudents([]);
-        }
-      } catch (studentErr) {
-        console.warn("Students endpoint isolated (404/Pending backend configuration state):", studentErr.message);
-        setStudents([]); 
-      }
-
+          if (Array.isArray(studentRes.data)) setStudents(studentRes.data);
+          else if (studentRes.data.data && Array.isArray(studentRes.data.data)) setStudents(studentRes.data.data);
+          else if (studentRes.data.students && Array.isArray(studentRes.data.students)) setStudents(studentRes.data.students);
+          else setStudents([]);
+        } else setStudents([]);
+      } catch (studentErr) { setStudents([]); }
       setLoading(false);
-    } catch (err) {
-      console.error("Fatal system initialization halt failure:", err);
-      setLoading(false);
-    }
+    } catch (err) { setLoading(false); }
   };
 
-  useEffect(() => { fetchDashboardData(); }, []);
+  // ✅ Refresh-Safe Effect: Token page refresh par safe rehta hai
+  useEffect(() => { 
+    fetchDashboardData(); 
+
+    const handlePageShow = (event) => {
+      if (event.persisted) {
+        const activeToken = sessionStorage.getItem('adminToken') || localStorage.getItem('adminToken');
+        if (!activeToken) {
+          window.location.replace('/admin/login');
+        }
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+
+    return () => {
+      window.removeEventListener('pageshow', handlePageShow);
+    };
+  }, []);
 
   const handleApprove = async (id) => {
     try {
-      const res = await axios.put(`${API_BASE_URL}/inquiries/${id}`, { status: 'Approved' });
+      const res = await api.put(`/admin/inquiries/${id}`, { status: 'Approved' });
       if (res.data.success) {
-        alert("Inquiry Approved & Student Migrated Successfully! 🎉");
-        fetchDashboardData(); // Refresh both students and inquiries clusters
+        alert("Inquiry Approved 🎉");
+        fetchDashboardData();
       }
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert(err.response?.data?.message || err.message); }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Delete inquiry?")) {
       try {
-        const res = await axios.delete(`${API_BASE_URL}/inquiries/${id}`);
+        const res = await api.delete(`/admin/inquiries/${id}`);
         if (res.data.success) setInquiries(prev => prev.filter(i => i._id !== id));
-      } catch (err) { alert(err.message); }
+      } catch (err) { alert(err.response?.data?.message || err.message); }
     }
   };
 
-  // 🚀 UPDATED COURSES CORE HANDLERS
   const handleAddCourse = async (formData) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/courses`, formData);
+      const res = await api.post('/admin/courses', formData);
       if (res.data.success) setCourses(prev => [res.data.data, ...prev]);
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert(err.response?.data?.message || err.message); }
   };
 
   const handleUpdateCourse = async (id, updates) => {
     try {
-      const res = await axios.put(`${API_BASE_URL}/courses/${id}`, updates);
+      const res = await api.put(`/admin/courses/${id}`, updates);
       if (res.data.success) setCourses(prev => prev.map(c => c._id === id ? res.data.data : c));
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert(err.response?.data?.message || err.message); }
   };
 
   const handleDeleteCourse = async (id) => {
-    if (window.confirm("Are you sure you want to delete this course permanently from server?")) {
+    if (window.confirm("Delete this course?")) {
       try {
-        const res = await axios.delete(`${API_BASE_URL}/courses/${id}`);
+        const res = await api.delete(`/admin/courses/${id}`);
         if (res.data.success) setCourses(prev => prev.filter(c => c._id !== id));
-      } catch (err) { alert(err.message); }
+      } catch (err) { alert(err.response?.data?.message || err.message); }
     }
   };
 
   const handleAddStudent = async (formData) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/students`, formData);
+      const res = await api.post('/admin/students', formData);
       if (res.data.success) setStudents(prev => [res.data.data, ...prev]);
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert(err.response?.data?.message || err.message); }
   };
 
   const handleUpdateStudent = async (id, updates) => {
     try {
-      const res = await axios.put(`${API_BASE_URL}/students/${id}`, updates);
+      const res = await api.put(`/admin/students/${id}`, updates);
       if (res.data.success) setStudents(prev => prev.map(s => s._id === id ? res.data.data : s));
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert(err.response?.data?.message || err.message); }
   };
 
   const handleDeleteStudent = async (id) => {
-    if (window.confirm("Purge student profile permanently?")) {
+    if (window.confirm("Purge student profile?")) {
       try {
-        const res = await axios.delete(`${API_BASE_URL}/students/${id}`);
+        const res = await api.delete(`/admin/students/${id}`);
         if (res.data.success) setStudents(prev => prev.filter(s => s._id !== id));
-      } catch (err) { alert(err.message); }
+      } catch (err) { alert(err.response?.data?.message || err.message); }
     }
   };
 
   const handleAddFee = async (studentId, feeData) => {
     try {
-      const res = await axios.post(`${API_BASE_URL}/students/${studentId}/fee`, feeData);
+      const res = await api.post(`/admin/students/${studentId}/fee`, feeData);
       if (res.data.success) setStudents(prev => prev.map(s => s._id === studentId ? res.data.data : s));
     } catch (err) { alert(err.response?.data?.message || err.message); }
   };
 
   const handleUpdateFee = async (studentId, feeId, statusUpdate) => {
     try {
-      const res = await axios.put(`${API_BASE_URL}/students/${studentId}/fee/${feeId}`, statusUpdate);
+      const res = await api.put(`/admin/students/${studentId}/fee/${feeId}`, statusUpdate);
       if (res.data.success) setStudents(prev => prev.map(s => s._id === studentId ? res.data.data : s));
-    } catch (err) { alert(err.message); }
+    } catch (err) { alert(err.response?.data?.message || err.message); }
   };
 
   const handleDeleteFee = async (studentId, feeId) => {
     if (window.confirm("Delete invoice record?")) {
       try {
-        const res = await axios.delete(`${API_BASE_URL}/students/${studentId}/fee/${feeId}`);
+        const res = await api.delete(`/admin/students/${studentId}/fee/${feeId}`);
         if (res.data.success) setStudents(prev => prev.map(s => s._id === studentId ? res.data.data : s));
-      } catch (err) { alert(err.message); }
+      } catch (err) { alert(err.response?.data?.message || err.message); }
     }
   };
 
@@ -264,7 +492,7 @@ const AdminDashboard = () => {
   const totalInq = safeInquiriesArray.length || 1;
 
   const stats = [
-    { label: 'Total Inquiries', value: safeInquiriesArray.length, color: T.accent, icon: 'users', pct: 100 },
+    { label: 'Total Inquiries', value: safeInquiriesArray.length, color: T.teal, icon: 'users', pct: 100 },
     { label: 'Pending Trials',  value: pendingCount,    color: T.amber,  icon: 'clock', pct: Math.round((pendingCount / totalInq) * 100) },
     { label: 'Active Students', value: students.length,    color: T.green,  icon: 'grad',  pct: 100 },
     { label: 'Total Courses',   value: courses.length,     color: T.violet, icon: 'book',  pct: 100 },
@@ -275,30 +503,56 @@ const AdminDashboard = () => {
     { id: 'inquiries', icon: 'users',     label: 'Inquiries', badge: pendingCount },
     { id: 'students',  icon: 'grad',      label: 'Students',  badge: (Array.isArray(students) ? students : []).filter(s=> s && s.status==='Active').length },
     { id: 'courses',   icon: 'book',      label: 'Courses' }, 
+    { id: 'blogs',     icon: 'blog',      label: 'Manage Blogs' },
+    { id: 'security',  icon: 'lock',      label: 'Change Password' },
+    { id: 'blacklist', icon: 'shield',    label: 'Threat Shield & IPs' } // 🛡️ New Security Tab
   ];
 
-  if (loading) return <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}><h3>Syncing Cluster Core Engine... Please Wait.</h3></div>;
+  if (loading) return (
+    <div style={{ display: 'flex', height: '100vh', alignItems: 'center', justifyContent: 'center', background: T.bg, flexDirection: 'column', gap: 14 }}>
+      <div style={{ width: 36, height: 36, borderRadius: '50%', border: `3px solid ${T.line}`, borderTopColor: T.accent, animation: 'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <h3 style={{ fontSize: 13, fontWeight: 600, color: T.sub, margin: 0 }}>Syncing dashboard data...</h3>
+    </div>
+  );
 
   return (
     <div style={S.root}>
       {/* SIDEBAR */}
-      <div style={{ ...S.sidebar, marginLeft: sidebarOpen ? 0 : -220, transition: 'margin 0.25s' }}>
-        <div style={S.logoRow}><div style={S.pulse} /><span style={S.logoText}>Al Quran Admin</span></div>
+      <div style={{ ...S.sidebar, marginLeft: sidebarOpen ? 0 : -232, transition: 'margin 0.25s' }}>
+        <div style={S.logoRow}>
+          <div style={S.logoBadge}><Icon d={Icons.crescent} size={17} /></div>
+          <div>
+            <div style={S.logoText}>Al Quran Institute</div>
+            <div style={S.logoSub}>Admin Console</div>
+          </div>
+        </div>
+        <div style={S.navLabel}>Main</div>
         <nav style={S.nav}>{navItems.map(item => (<NavBtn key={item.id} icon={item.icon} label={item.label} active={activeTab === item.id} badge={item.badge} onClick={() => setActiveTab(item.id)} />))}</nav>
-        <div style={S.logoutArea}><button style={S.logoutBtn}><Icon d={Icons.logout} size={15} />Logout</button></div>
+        
+        <div style={S.logoutArea}>
+          <button style={S.logoutBtn} onClick={() => { if (window.confirm("Are you sure you want to log out?")) handleLogout(); }}>
+            <Icon d={Icons.logout} size={15} />Logout
+          </button>
+        </div>
       </div>
 
       {/* MAIN VIEW AREA */}
       <div style={S.main}>
         <header style={S.topbar}>
-          <button onClick={() => setSidebarOpen(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex', marginRight: 'auto' }}><Icon d={Icons.bars} size={18} /></button>
-          <div style={S.userInfo}><div style={S.userName}>Mohsin Ishfaq</div><div style={S.userRole}>Super Admin</div></div><div style={S.avatar}>MI</div>
+          <div style={S.topbarLeft}>
+            <button onClick={() => setSidebarOpen(v => !v)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', display: 'flex' }}><Icon d={Icons.bars} size={18} /></button>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={S.bellBtn}><Icon d={Icons.bell} size={16} /><span style={S.bellDot} /></div>
+            <div style={S.userInfo}><div style={S.userName}>Mohsin Ishfaq</div><div style={S.userRole}>Super Admin</div></div>
+            <div style={S.avatar}>MI</div>
+          </div>
         </header>
 
         <main style={S.content}>
           {activeTab === 'dashboard' && <DashboardTab inquiries={inquiries} handleApprove={handleApprove} handleDelete={handleDelete} setActiveTab={setActiveTab} stats={stats} />}
           
-          {/* 🚀 RENDER THE INQUIRIES MODULE WHEN ACTIVE */}
           {activeTab === 'inquiries' && (
             <InquiriesModule 
               inquiries={safeInquiriesArray} 
@@ -308,7 +562,6 @@ const AdminDashboard = () => {
             />
           )}
           
-          {/* 🚀 RENDER THE INDEPENDENT OUTSOURCED MODULE WITH COMPACT STATE ROUTING */}
           {activeTab === 'courses' && (
             <CoursesModule 
               courses={courses}
@@ -326,6 +579,18 @@ const AdminDashboard = () => {
               onAddFee={handleAddFee} onUpdateFee={handleUpdateFee} onDeleteFee={handleDeleteFee}
               ActionBtn={ActionBtn} S={S} T={T} Icon={Icon} Icons={Icons}
             />
+          )}
+
+          {activeTab === 'blogs' && (
+            <AdminAddBlog />
+          )}
+
+          {activeTab === 'security' && (
+            <SecurityTab handleLogout={handleLogout} />
+          )}
+
+          {activeTab === 'blacklist' && (
+            <SecurityDashboard />
           )}
         </main>
       </div>

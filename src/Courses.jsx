@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { 
   FaBookOpen, FaMicrophoneAlt, FaHeart, FaStar, 
-  FaLanguage, FaLayerGroup, FaBookReader, FaMoon, FaWhatsapp 
+  FaLanguage, FaLayerGroup, FaBookReader, FaMoon, FaWhatsapp, FaWpforms 
 } from 'react-icons/fa';
 
 const IconDictionary = {
@@ -16,7 +16,7 @@ const IconDictionary = {
   heart: <FaHeart />
 };
 
-const Courses = () => {
+const Courses = ({ onDirectRegisterTrigger = null }) => {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,6 +40,20 @@ const Courses = () => {
     };
     fetchPublicCourses();
   }, []);
+
+  const handleAdmissionFormClick = () => {
+    if (onDirectRegisterTrigger && selectedCourse) {
+      const courseTitle = selectedCourse.title;
+      setSelectedCourse(null); 
+      onDirectRegisterTrigger(courseTitle);
+    } else {
+      setSelectedCourse(null);
+      setTimeout(() => {
+        const target = document.getElementById('register-section');
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
 
   if (loading) {
     return (
@@ -66,9 +80,9 @@ const Courses = () => {
             <span className="text-orange-500 text-[11px] font-black uppercase tracking-[0.4em]">Our Specialized Programs</span>
             <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-blue-900 tracking-tight leading-tight">
+          <h2 className="text-4xl md:text-5xl font-black text-blue-900 tracking-tight leading-tight">
             Explore Our <span className="italic">Popular Courses</span>
-          </h1>
+          </h2>
           <p className="mt-4 text-slate-500 font-medium text-sm md:text-base max-w-xl mx-auto">
             Structured Quranic programs designed for all ages — from complete beginners to advanced learners across the globe.
           </p>
@@ -150,9 +164,9 @@ const Courses = () => {
               {IconDictionary[selectedCourse.iconKey] || <FaBookOpen />}
             </div>
 
-            <h2 className="text-3xl font-black text-[#001f3f] mb-2 leading-tight">
+            <h3 className="text-3xl font-black text-[#001f3f] mb-2 leading-tight">
               {selectedCourse.title}
-            </h2>
+            </h3>
             <div className="h-1 w-12 bg-orange-500 rounded-full mb-6"></div>
 
             <div className="flex flex-wrap gap-2 mb-6">
@@ -172,18 +186,26 @@ const Courses = () => {
               {selectedCourse.detail}
             </p>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={handleAdmissionFormClick}
+                className="flex-1 bg-gradient-to-r from-blue-900 to-indigo-950 text-white px-6 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-blue-200 transition-all flex items-center justify-center gap-2"
+              >
+                Fill Admission Form <FaWpforms size={16} />
+              </button>
+
               <a
                 href="https://wa.me/923485654503"
                 target="_blank"
                 rel="noreferrer"
                 className="flex-1 min-w-[140px] bg-[#25D366] text-white px-6 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest shadow-lg hover:-translate-y-1 hover:shadow-green-200 transition-all flex items-center justify-center gap-2"
               >
-                Enroll Now <FaWhatsapp size={18} />
+                Inquire via WhatsApp <FaWhatsapp size={18} />
               </a>
+              
               <button
                 onClick={() => setSelectedCourse(null)}
-                className="flex-1 min-w-[140px] bg-slate-100 text-[#001f3f] px-6 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-200 transition-all"
+                className="bg-slate-100 text-[#001f3f] px-6 py-4 rounded-2xl font-black uppercase text-[11px] tracking-widest hover:bg-slate-200 transition-all sm:flex-initial"
               >
                 Go Back
               </button>
