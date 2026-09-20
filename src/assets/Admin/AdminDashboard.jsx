@@ -7,6 +7,7 @@ import CoursesModule from './CoursesModule';
 import InquiriesModule from "./InquiriesModule";
 import AdminAddBlog from './AdminAddBlog'; 
 import SecurityDashboard from './SecurityDashboard'; // 🛡️ Banned IPs & Threat Shield Module
+import { PricingModule } from './PricingModule'; // 💳 Local Directory Import Guard
 
 // ─── Centralized Axios Instance with Auto-Token & 401 Guard ─────────────────
 const api = axios.create({
@@ -279,7 +280,7 @@ const SecurityTab = ({ handleLogout }) => {
             <input 
               type="password" 
               required
-              value={currentPassword}
+              value={currentPassword} 
               onChange={e => setCurrentPassword(e.target.value)}
               placeholder="Enter existing password"
               style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1px solid ${T.line}`, outline: 'none', fontSize: 13, boxSizing: 'border-box' }}
@@ -291,7 +292,7 @@ const SecurityTab = ({ handleLogout }) => {
             <input 
               type="password" 
               required
-              value={newPassword}
+              value={newPassword} 
               onChange={e => setNewPassword(e.target.value)}
               placeholder="At least 8 characters"
               style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1px solid ${T.line}`, outline: 'none', fontSize: 13, boxSizing: 'border-box' }}
@@ -303,7 +304,7 @@ const SecurityTab = ({ handleLogout }) => {
             <input 
               type="password" 
               required
-              value={confirmPassword}
+              value={confirmPassword} 
               onChange={e => setConfirmPassword(e.target.value)}
               placeholder="Repeat new password"
               style={{ width: '100%', padding: '10px 12px', borderRadius: 8, border: `1px solid ${T.line}`, outline: 'none', fontSize: 13, boxSizing: 'border-box' }}
@@ -341,6 +342,7 @@ const AdminDashboard = () => {
   const [inquiries, setInquiries]     = useState([]);
   const [courses, setCourses]         = useState([]);
   const [students, setStudents]       = useState([]); 
+  const [pricingPlans, setPricingPlans] = useState([]); // 💳 Tuition Plans State
   const [loading, setLoading]         = useState(true);
 
   const navigate = useNavigate();
@@ -375,6 +377,16 @@ const AdminDashboard = () => {
           else setStudents([]);
         } else setStudents([]);
       } catch (studentErr) { setStudents([]); }
+
+      // 💳 Protected Pricing Fetch: Error aane par dashboard crash nahi hoga
+      try {
+        const priceRes = await api.get('/pricing/admin/all');
+        setPricingPlans(priceRes.data?.data || []);
+      } catch (priceErr) { 
+        console.warn("Pricing route pending backend mount:", priceErr.message); 
+        setPricingPlans([]);
+      }
+
       setLoading(false);
     } catch (err) { setLoading(false); }
   };
@@ -487,15 +499,47 @@ const AdminDashboard = () => {
     }
   };
 
+  // 💳 Tuition Plan Actions
+  const handleAddPlan = async (formData) => {
+    try {
+      const res = await api.post('/pricing/admin/create', formData);
+      if (res.data.success) {
+        setPricingPlans(prev => [res.data.data, ...prev]);
+        alert("Tuition Plan Created 🎉");
+      }
+    } catch (err) { 
+      alert(err.response?.data?.message || "Ensure /api/pricing route is added in server.js"); 
+    }
+  };
+
+  const handleUpdatePlan = async (id, updates) => {
+    try {
+      const res = await api.put(`/pricing/admin/update/${id}`, updates);
+      if (res.data.success) {
+        setPricingPlans(prev => prev.map(p => p._id === id ? res.data.data : p));
+        alert("Tuition Plan Updated 👍");
+      }
+    } catch (err) { alert(err.response?.data?.message || err.message); }
+  };
+
+  const handleDeletePlan = async (id) => {
+    if (window.confirm("Delete this tuition plan?")) {
+      try {
+        const res = await api.delete(`/pricing/admin/delete/${id}`);
+        if (res.data.success) setPricingPlans(prev => prev.filter(p => p._id !== id));
+      } catch (err) { alert(err.response?.data?.message || err.message); }
+    }
+  };
+
   const safeInquiriesArray = Array.isArray(inquiries) ? inquiries : [];
   const pendingCount = safeInquiriesArray.filter(i => i && i.status === 'Pending').length;
   const totalInq = safeInquiriesArray.length || 1;
 
   const stats = [
     { label: 'Total Inquiries', value: safeInquiriesArray.length, color: T.teal, icon: 'users', pct: 100 },
-    { label: 'Pending Trials',  value: pendingCount,    color: T.amber,  icon: 'clock', pct: Math.round((pendingCount / totalInq) * 100) },
-    { label: 'Active Students', value: students.length,    color: T.green,  icon: 'grad',  pct: 100 },
-    { label: 'Total Courses',   value: courses.length,     color: T.violet, icon: 'book',  pct: 100 },
+    { label: 'Pending Trials',  value: pendingCount,            color: T.amber, icon: 'clock', pct: Math.round((pendingCount / totalInq) * 100) },
+    { label: 'Active Students', value: students.length,          color: T.green, icon: 'grad',  pct: 100 },
+    { label: 'Total Courses',   value: courses.length,           color: T.violet, icon: 'book',  pct: 100 },
   ];
 
   const navItems = [
@@ -503,9 +547,10 @@ const AdminDashboard = () => {
     { id: 'inquiries', icon: 'users',     label: 'Inquiries', badge: pendingCount },
     { id: 'students',  icon: 'grad',      label: 'Students',  badge: (Array.isArray(students) ? students : []).filter(s=> s && s.status==='Active').length },
     { id: 'courses',   icon: 'book',      label: 'Courses' }, 
+    { id: 'pricing',   icon: 'wallet',    label: 'Tuition Plans' }, // 💳 Tuition Plans Tab
     { id: 'blogs',     icon: 'blog',      label: 'Manage Blogs' },
     { id: 'security',  icon: 'lock',      label: 'Change Password' },
-    { id: 'blacklist', icon: 'shield',    label: 'Threat Shield & IPs' } // 🛡️ New Security Tab
+    { id: 'blacklist', icon: 'shield',    label: 'Threat Shield & IPs' } // 🛡️ Security Tab
   ];
 
   if (loading) return (
@@ -564,11 +609,21 @@ const AdminDashboard = () => {
           
           {activeTab === 'courses' && (
             <CoursesModule 
-              courses={courses}
-              onAddCourse={handleAddCourse}
-              onUpdateCourse={handleUpdateCourse}
-              onDeleteCourse={handleDeleteCourse}
+              courses={courses} 
+              onAddCourse={handleAddCourse} 
+              onUpdateCourse={handleUpdateCourse} 
+              onDeleteCourse={handleDeleteCourse} 
               ActionBtn={ActionBtn} S={S} T={T}
+            />
+          )}
+
+          {/* 💳 TUITION PLANS MODULE */}
+          {activeTab === 'pricing' && (
+            <PricingModule 
+              plans={pricingPlans} 
+              onAddPlan={handleAddPlan} 
+              onUpdatePlan={handleUpdatePlan} 
+              onDeletePlan={handleDeletePlan} 
             />
           )}
 

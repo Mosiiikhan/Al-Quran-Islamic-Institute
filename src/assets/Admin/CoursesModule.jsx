@@ -14,22 +14,43 @@ const levelConfig = {
   'All Levels':   { bg: '#f0fdfa', border: '#99f6e4', color: '#0d9488', dot: '#14b8a6' },
 };
 
+// Helper to preview slug in real-time
+const slugify = (text = '') => {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+};
+
 // ─── MODAL ───────────────────────────────────────────────────────────────────
 export const AdminCourseFormModal = ({ course, onClose, onSave }) => {
   const isEdit = !!course;
   const [form, setForm] = useState({
-    title:    course?.title    || '',
-    level:    course?.level    || 'Beginner',
-    price:    course?.price    || '',
-    duration: course?.duration || '',
-    students: course?.students || 0,
-    desc:     course?.desc     || '',
-    detail:   course?.detail   || '',
-    iconKey:  course?.iconKey  || 'bookOpen',
-    color:    course?.color    || 'from-teal-500 to-teal-700',
+    title:      course?.title      || '',
+    slug:       course?.slug       || '',
+    level:      course?.level      || 'Beginner',
+    price:      course?.price      || '',
+    duration:   course?.duration   || '',
+    students:   course?.students   || 0,
+    desc:       course?.desc       || '',
+    detail:     course?.detail     || '',
+    iconKey:    course?.iconKey    || 'bookOpen',
+    color:      course?.color      || 'from-teal-500 to-teal-700',
+    isFeatured: course?.isFeatured !== undefined ? course.isFeatured : true,
   });
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  const handleTitleChange = (val) => {
+    setForm(p => ({
+      ...p,
+      title: val,
+      // Agar edit mode na ho ya custom slug na ho to title se auto slug generate ho
+      slug: slugify(val)
+    }));
+  };
 
   return (
     <div
@@ -38,7 +59,7 @@ export const AdminCourseFormModal = ({ course, onClose, onSave }) => {
     >
       <div
         onClick={e => e.stopPropagation()}
-        style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 540, maxHeight: '92vh', overflowY: 'auto', boxShadow: '0 32px 80px rgba(0,20,40,0.3)', display: 'flex', flexDirection: 'column' }}
+        style={{ background: '#fff', borderRadius: 20, width: '100%', maxWidth: 560, maxHeight: '92vh', overflowY: 'auto', boxShadow: '0 32px 80px rgba(0,20,40,0.3)', display: 'flex', flexDirection: 'column' }}
       >
         {/* Modal Header */}
         <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, background: '#fff', zIndex: 1, borderRadius: '20px 20px 0 0' }}>
@@ -47,7 +68,7 @@ export const AdminCourseFormModal = ({ course, onClose, onSave }) => {
               {isEdit ? '✏️ Edit Program' : '🚀 Add New Program'}
             </div>
             <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>
-              {isEdit ? 'Update the course details below' : 'Fill in the details to publish a new course'}
+              {isEdit ? 'Update course details and visibility' : 'Fill in the details to publish a new course'}
             </div>
           </div>
           <button
@@ -61,22 +82,60 @@ export const AdminCourseFormModal = ({ course, onClose, onSave }) => {
 
           {/* Title */}
           <Field label="Program Title *">
-            <Input value={form.title} onChange={v => set('title', v)} placeholder="e.g. Tajweed-ul-Quran" />
+            <Input value={form.title} onChange={handleTitleChange} placeholder="e.g. Tajweed-ul-Quran for Kids" />
           </Field>
+
+          {/* SEO Slug Preview */}
+          <div style={{ background: '#f1f5f9', borderRadius: 8, padding: '8px 12px', display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#475569' }}>
+            <span style={{ fontWeight: 700, color: '#0f766e' }}>SEO URL:</span>
+            <span>/courses/{form.slug || slugify(form.title) || 'course-url-slug'}</span>
+          </div>
+
+          {/* Featured Toggle Switch */}
+          <div style={{ background: form.isFeatured ? '#fefce8' : '#f8fafc', border: `1.5px solid ${form.isFeatured ? '#fef08a' : '#e2e8f0'}`, borderRadius: 12, padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'all 0.2s' }}>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 800, color: form.isFeatured ? '#854d0e' : '#334155', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span>⭐ Show on Homepage (Featured)</span>
+                {form.isFeatured && <span style={{ background: '#ca8a04', color: '#fff', fontSize: 9, padding: '2px 6px', borderRadius: 10, textTransform: 'uppercase' }}>Active</span>}
+              </div>
+              <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 2 }}>
+                Display this program in the top 4 showcase cards on the main landing page.
+              </div>
+            </div>
+            <label style={{ position: 'relative', display: 'inline-block', width: 44, height: 24, cursor: 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={form.isFeatured} 
+                onChange={e => set('isFeatured', e.target.checked)}
+                style={{ opacity: 0, width: 0, height: 0 }}
+              />
+              <span style={{
+                position: 'absolute', inset: 0,
+                background: form.isFeatured ? '#0d9488' : '#cbd5e1',
+                borderRadius: 24, transition: '0.3s',
+              }}>
+                <span style={{
+                  position: 'absolute', height: 18, width: 18, left: form.isFeatured ? 22 : 3, bottom: 3,
+                  background: '#fff', borderRadius: '50%', transition: '0.3s',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }} />
+              </span>
+            </label>
+          </div>
 
           {/* Short Desc */}
           <Field label="Short Card Description *">
-            <Input value={form.desc} onChange={v => set('desc', v)} placeholder="Short text shown on course card..." />
+            <Input value={form.desc} onChange={v => set('desc', v)} placeholder="Short teaser text shown on course cards..." />
           </Field>
 
           {/* Detail */}
-          <Field label="Detailed Modal Description *">
+          <Field label="Detailed Syllabus Description *">
             <textarea
               value={form.detail}
               onChange={e => set('detail', e.target.value)}
-              placeholder="Full description shown in course detail popup..."
+              placeholder="Full description shown on the dedicated course landing page..."
               rows={3}
-              style={{ ...inputStyle, resize: 'vertical', minHeight: 72 }}
+              style={{ ...inputStyle, resize: 'vertical', minHeight: 75 }}
             />
           </Field>
 
@@ -88,7 +147,7 @@ export const AdminCourseFormModal = ({ course, onClose, onSave }) => {
               </select>
             </Field>
             <Field label="Session Duration">
-              <Input value={form.duration} onChange={v => set('duration', v)} placeholder="e.g. 40 Mins" />
+              <Input value={form.duration} onChange={v => set('duration', v)} placeholder="e.g. 30-40 Mins" />
             </Field>
           </div>
 
@@ -109,18 +168,21 @@ export const AdminCourseFormModal = ({ course, onClose, onSave }) => {
                 {Object.entries(iconEmoji).map(([k, v]) => <option key={k} value={k}>{v} {k}</option>)}
               </select>
             </Field>
-            <Field label="Gradient Color">
-              <Input value={form.color} onChange={v => set('color', v)} placeholder="from-blue-500 to-blue-700" />
+            <Field label="Gradient Accent Color">
+              <Input value={form.color} onChange={v => set('color', v)} placeholder="from-teal-500 to-teal-700" />
             </Field>
           </div>
 
           {/* Preview chip */}
           <div style={{ background: '#f8fafc', borderRadius: 10, padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 10, border: '1px solid #e2e8f0' }}>
             <span style={{ fontSize: 22 }}>{iconEmoji[form.iconKey] || '📖'}</span>
-            <div>
-              <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>{form.title || 'Course Title Preview'}</div>
-              <div style={{ fontSize: 10, color: '#94a3b8' }}>{form.level} · {form.duration || '—'} · {form.price || '—'}/mo</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: '#0f172a' }}>{form.title || 'Program Title Preview'}</div>
+              <div style={{ fontSize: 10, color: '#94a3b8' }}>{form.level} · {form.duration || 'Flexible'} · {form.price || '$45'}/mo</div>
             </div>
+            {form.isFeatured && (
+              <span style={{ fontSize: 9, fontWeight: 800, background: '#fef08a', color: '#854d0e', padding: '3px 8px', borderRadius: 6 }}>⭐ FEATURED</span>
+            )}
           </div>
 
         </div>
@@ -181,7 +243,7 @@ const CourseCard = ({ c, onEdit, onDelete }) => {
       onMouseLeave={() => setHovered(false)}
       style={{
         background: '#fff',
-        border: `1.5px solid ${hovered ? '#cbd5e1' : '#e2e8f0'}`,
+        border: `1.5px solid ${c.isFeatured ? '#fde047' : (hovered ? '#cbd5e1' : '#e2e8f0')}`,
         borderRadius: 16,
         padding: 18,
         display: 'flex',
@@ -191,10 +253,19 @@ const CourseCard = ({ c, onEdit, onDelete }) => {
         boxShadow: hovered ? '0 8px 24px rgba(0,0,0,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
         transform: hovered ? 'translateY(-2px)' : 'none',
         cursor: 'default',
+        position: 'relative',
+        overflow: 'hidden'
       }}
     >
+      {/* Featured Corner Badge */}
+      {c.isFeatured && (
+        <div style={{ position: 'absolute', top: 0, right: 0, background: '#fef08a', color: '#854d0e', fontSize: 9, fontWeight: 800, padding: '3px 10px', borderRadius: '0 0 0 10px', borderBottom: '1px solid #fde047', borderLeft: '1px solid #fde047' }}>
+          ⭐ HOME FEATURED
+        </div>
+      )}
+
       {/* Card Top Row */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: c.isFeatured ? 6 : 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
             {iconEmoji[c.iconKey] || '📖'}
@@ -242,9 +313,10 @@ const CourseCard = ({ c, onEdit, onDelete }) => {
 };
 
 // ─── MAIN MODULE ──────────────────────────────────────────────────────────────
-const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCourse, ActionBtn, S, T }) => {
+const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCourse }) => {
   const [query, setQuery] = useState('');
   const [levelFilter, setLevelFilter] = useState('All');
+  const [featuredOnly, setFeaturedOnly] = useState(false);
   const [modalData, setModalData] = useState(null);
 
   const safeCourses = Array.isArray(courses) ? courses : [];
@@ -253,7 +325,8 @@ const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCour
     if (!c) return false;
     const matchLevel = levelFilter === 'All' || c.level === levelFilter;
     const matchQuery = (c.title || '').toLowerCase().includes(query.toLowerCase());
-    return matchLevel && matchQuery;
+    const matchFeatured = !featuredOnly || c.isFeatured === true;
+    return matchLevel && matchQuery && matchFeatured;
   });
 
   const handleSave = async (id, formData) => {
@@ -271,7 +344,7 @@ const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCour
       {/* Page Header */}
       <div style={{ marginBottom: 20 }}>
         <div style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', marginBottom: 4 }}>📚 Manage Courses</div>
-        <div style={{ fontSize: 12, color: '#94a3b8' }}>Add, edit, or remove Quranic programs from your academy.</div>
+        <div style={{ fontSize: 12, color: '#94a3b8' }}>Add, edit, or control homepage featured courses.</div>
       </div>
 
       {/* Toolbar */}
@@ -283,7 +356,7 @@ const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCour
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Search courses..."
+            placeholder="Search programs..."
             style={{ width: '100%', padding: '8px 10px 8px 30px', borderRadius: 8, border: '1px solid #e2e8f0', fontSize: 12, background: '#fff', boxSizing: 'border-box', outline: 'none' }}
           />
         </div>
@@ -299,9 +372,22 @@ const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCour
           ))}
         </select>
 
+        {/* Featured Only Filter Pill */}
+        <button
+          onClick={() => setFeaturedOnly(!featuredOnly)}
+          style={{
+            padding: '7px 12px', borderRadius: 8, fontSize: 11, fontWeight: 700, cursor: 'pointer',
+            border: `1.5px solid ${featuredOnly ? '#facc15' : '#e2e8f0'}`,
+            background: featuredOnly ? '#fefce8' : '#fff',
+            color: featuredOnly ? '#854d0e' : '#64748b',
+          }}
+        >
+          ⭐ Homepage Only ({safeCourses.filter(c => c.isFeatured).length})
+        </button>
+
         {/* Count */}
         <span style={{ fontSize: 11, color: '#94a3b8', whiteSpace: 'nowrap' }}>
-          {filtered.length} / {safeCourses.length} courses
+          {filtered.length} / {safeCourses.length}
         </span>
 
         {/* Add Button */}
@@ -313,35 +399,15 @@ const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCour
         </button>
       </div>
 
-      {/* Level Filter Pills */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        {['All', 'Beginner', 'Intermediate', 'Advanced', 'All Levels'].map(l => {
-          const lc = levelConfig[l] || { bg: '#f1f5f9', border: '#e2e8f0', color: '#64748b', dot: '#94a3b8' };
-          const active = levelFilter === l;
-          return (
-            <button
-              key={l}
-              onClick={() => setLevelFilter(l)}
-              style={{
-                padding: '5px 14px', borderRadius: 20, fontSize: 11, fontWeight: 700, cursor: 'pointer', border: `1.5px solid ${active ? lc.border : '#e2e8f0'}`,
-                background: active ? lc.bg : '#fff', color: active ? lc.color : '#94a3b8', transition: 'all 0.15s',
-              }}
-            >
-              {l}
-            </button>
-          );
-        })}
-      </div>
-
       {/* Course Cards Grid */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '48px 0', color: '#94a3b8' }}>
           <div style={{ fontSize: 36, marginBottom: 10 }}>📭</div>
           <div style={{ fontSize: 14, fontWeight: 600 }}>No courses found</div>
-          <div style={{ fontSize: 12, marginTop: 4 }}>Try a different search or add a new course.</div>
+          <div style={{ fontSize: 12, marginTop: 4 }}>Try changing your filter settings or add a new course.</div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 14 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 14 }}>
           {filtered.map(c => (
             <CourseCard
               key={c._id}
@@ -351,7 +417,7 @@ const CoursesModule = ({ courses = [], onAddCourse, onUpdateCourse, onDeleteCour
             />
           ))}
 
-          {/* Add New Card */}
+          {/* Add New Quick Card */}
           <div
             onClick={() => setModalData({ mode: 'add' })}
             style={{

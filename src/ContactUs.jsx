@@ -2,7 +2,10 @@ import React, { useState, useMemo } from 'react';
 import { FaWhatsapp, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
 import { countries } from 'countries-list';
 
-const ContactUs = () => {
+import SEOEngine from './SEO/SEOEngine';
+import { contactUsSEO } from './SEO/contactUsSEO';
+
+const ContactUs = ({ isHomePage = false }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -55,6 +58,18 @@ const ContactUs = () => {
 
   return (
     <>
+      {/* 🚀 Dynamic ContactPage & Organization Schema Injection (Active on dedicated /contact-us route) */}
+      {!isHomePage && (
+        <SEOEngine 
+          title={contactUsSEO.title}
+          description={contactUsSEO.description}
+          canonicalUrl={contactUsSEO.canonicalUrl}
+          keywords={contactUsSEO.keywords}
+          ogImage={contactUsSEO.ogImage}
+          schemaJson={contactUsSEO.schema}
+        />
+      )}
+
       {/* ── SUCCESS MODAL ── */}
       {showSuccess && (
         <div

@@ -1,247 +1,287 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  FaCheck, FaStar, FaLeaf, FaBookOpen, FaCrown, 
-  FaGift, FaCalendarAlt, FaCalendarCheck, FaUserEdit, FaWhatsapp
-} from 'react-icons/fa';
-
-const IconMap = {
-  leaf: <FaLeaf />,
-  bookOpen: <FaBookOpen />,
-  crown: <FaCrown />,
-  star: <FaStar />
-};
+import { FaWhatsapp, FaStar, FaClock } from 'react-icons/fa';
 
 const FeeStructure = () => {
-  const [dbCourses, setDbCourses] = useState([]);
+  const [currency, setCurrency] = useState('USD'); // 'USD' | 'GBP'
+  const [duration, setDuration] = useState('30');   // '30' | '45'
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const WHATSAPP = '923485654503';
+
   useEffect(() => {
-    const fetchPricing = async () => {
+    const fetchPlans = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/admin/courses');
-        const arrayData = res.data?.data || res.data;
-        if (Array.isArray(arrayData)) {
-          setDbCourses(arrayData);
+        setLoading(true);
+        const res = await axios.get(`${API_BASE}/api/pricing/public-plans`);
+        if (res.data?.success && res.data.data.length > 0) {
+          setPlans(res.data.data);
+        } else {
+          // Fallback initial data
+          setPlans([
+            {
+              _id: '1', title: 'Weekend Classes', schedule: 'Saturday & Sunday', classesPerMonth: 8,
+              priceUSD30: 40, priceGBP30: 32, priceUSD45: 55, priceGBP45: 44, isPopular: false
+            },
+            {
+              _id: '2', title: '2 Days / Week', schedule: 'Any 2 Days (Mon - Fri)', classesPerMonth: 8,
+              priceUSD30: 36, priceGBP30: 29, priceUSD45: 50, priceGBP45: 40, isPopular: false
+            },
+            {
+              _id: '3', title: '3 Days / Week', schedule: 'Any 3 Days (Mon - Fri)', classesPerMonth: 12,
+              priceUSD30: 50, priceGBP30: 40, priceUSD45: 68, priceGBP45: 54, isPopular: true
+            },
+            {
+              _id: '4', title: '5 Days / Week', schedule: 'Monday to Friday', classesPerMonth: 20,
+              priceUSD30: 80, priceGBP30: 64, priceUSD45: 110, priceGBP45: 88, isPopular: false
+            }
+          ]);
         }
       } catch (err) {
-        console.error("Pricing sync failure:", err);
+        console.error('Tuition plans fetch fail:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchPricing();
-  }, []);
+    fetchPlans();
+  }, [API_BASE]);
 
-  if (loading) {
-    return (
-      <div className="py-24 flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 rounded-full border-4 border-orange-200 border-t-orange-500 animate-spin"></div>
-        <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Syncing Pricing Plans...</p>
-      </div>
-    );
-  }
+  const currSymbol = currency === 'USD' ? '$' : '£';
 
-  const cardConfigs = [
-    { color: 'sky', iconBg: 'bg-sky-50 text-sky-600', accent: 'from-sky-400 to-sky-600', border: 'border-slate-100' },
-    { color: 'orange', iconBg: 'bg-orange-50 text-orange-600', accent: 'from-orange-400 to-orange-600', border: 'border-orange-400' },
-    { color: 'purple', iconBg: 'bg-purple-50 text-purple-600', accent: 'from-purple-400 to-purple-600', border: 'border-slate-100' },
-  ];
+  // 🎯 Dynamic price resolution according to both duration and currency toggles
+  const getPrice = (item) => {
+    if (duration === '30') {
+      return currency === 'USD' ? (item.priceUSD30 || item.priceUSD || 0) : (item.priceGBP30 || item.priceGBP || 0);
+    } else {
+      return currency === 'USD' ? (item.priceUSD45 || 0) : (item.priceGBP45 || 0);
+    }
+  };
+
+  const trialLink = (item) =>
+    `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
+      `Assalam-o-Alaikum, I want to book a 3-Day Free Trial for ${item.title} (${duration} Mins/Class, ${currSymbol}${getPrice(item)}/month).`
+    )}`;
 
   return (
-    <section id="fee-section" className="py-20 bg-[#f8faff] relative overflow-hidden">
+    <section id="fee-section" className="py-16 md:py-24 bg-[#f8faff] font-sans">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
 
-      {/* Background decorations */}
-      <div className="absolute top-0 right-0 w-80 h-80 bg-orange-100 rounded-full blur-3xl opacity-20 pointer-events-none translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-sky-100 rounded-full blur-3xl opacity-20 pointer-events-none -translate-x-1/2 translate-y-1/2"></div>
-
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-
-        {/* Header */}
-        <div className="text-center mb-14">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
-            <span className="text-orange-500 text-[11px] font-black uppercase tracking-[0.4em]">Pricing Table</span>
-            <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-blue-900 tracking-tight leading-tight">
-            Simple & <span className="italic">Transparent Plans</span>
-          </h1>
-          <p className="mt-4 text-slate-500 font-medium text-sm md:text-base max-w-xl mx-auto">
-            Affordable Quranic education for every family — no hidden fees, no contracts, cancel anytime.
+        {/* ─── HEADER ─── */}
+        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#001f3f] tracking-tight mb-3">
+            Tuition Fee Plans
+          </h2>
+          <p className="text-slate-600 text-base sm:text-lg font-medium">
+            3-Day Free Trial • Free Admission • No Hidden Charges
           </p>
-        </div>
 
-        {/* ROW 1: Dynamic Main Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 items-start">
-          {dbCourses.map((plan, index) => {
-            const config = cardConfigs[index] || cardConfigs[0];
-            const isPopular = index === 1;
-
-            return (
-              <div
-                key={plan._id}
-                className={`relative bg-white rounded-3xl flex flex-col overflow-hidden border-2 transition-all duration-500 hover:-translate-y-2 ${
-                  isPopular
-                    ? 'border-orange-400 shadow-2xl shadow-orange-100 md:scale-105 md:z-10'
-                    : 'border-slate-100 shadow-md hover:shadow-xl'
+          {/* ─── DUAL SWITCHER: CURRENCY & CLASS TIME ─── */}
+          <div className="flex flex-wrap items-center justify-center gap-4 mt-7">
+            
+            {/* Currency Toggle */}
+            <div className="inline-flex items-center bg-white p-1 rounded-2xl border-2 border-slate-200 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setCurrency('USD')}
+                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                  currency === 'USD'
+                    ? 'bg-[#001f3f] text-white shadow-md'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                {/* Top accent bar */}
-                <div className={`h-1.5 w-full bg-gradient-to-r ${config.accent}`}></div>
+                🇺🇸 USD ($)
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrency('GBP')}
+                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                  currency === 'GBP'
+                    ? 'bg-[#001f3f] text-white shadow-md'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                🇬🇧 GBP (£)
+              </button>
+            </div>
 
-                {isPopular && (
-                  <div className="absolute top-4 right-4">
-                    <span className="bg-orange-500 text-white text-[9px] font-black px-3 py-1.5 rounded-full uppercase tracking-widest shadow-md">
-                      ⭐ Most Popular
-                    </span>
-                  </div>
-                )}
+            {/* Duration Toggle (30 Mins vs 45 Mins) */}
+            <div className="inline-flex items-center bg-white p-1 rounded-2xl border-2 border-slate-200 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setDuration('30')}
+                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${
+                  duration === '30'
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <FaClock size={13} /> 30 Mins / Class
+              </button>
+              <button
+                type="button"
+                onClick={() => setDuration('45')}
+                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${
+                  duration === '45'
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <FaClock size={13} /> 45 Mins / Class
+              </button>
+            </div>
 
-                <div className="p-7 flex flex-col flex-1">
+          </div>
+        </div>
 
-                  {/* Icon */}
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl mb-5 ${config.iconBg}`}>
-                    {IconMap[plan.iconKey] || <FaBookOpen />}
-                  </div>
+        {/* ─── DESKTOP TABLE VIEW ─── */}
+        {loading ? (
+          <div className="py-20 text-center text-slate-500 font-bold">Loading Plans...</div>
+        ) : (
+          <div className="hidden md:block bg-white rounded-3xl border-2 border-slate-200 overflow-hidden shadow-sm mb-10">
+            <div className="grid grid-cols-12 bg-[#001f3f] text-white px-8 py-5 text-sm font-bold uppercase tracking-wider">
+              <div className="col-span-4">Plan / Days</div>
+              <div className="col-span-2 text-center">Class Time</div>
+              <div className="col-span-2 text-center">Monthly Classes</div>
+              <div className="col-span-2 text-center">Monthly Fee</div>
+              <div className="col-span-2 text-right">Free Trial</div>
+            </div>
 
-                  {/* Title & Level */}
-                  <h3 className="text-xl font-black text-[#001f3f] mb-1">{plan.title}</h3>
-                  <p className="text-slate-400 font-bold text-[10px] uppercase tracking-widest mb-5 italic">{plan.level}</p>
-
-                  {/* Price */}
-                  <div className="flex items-baseline gap-1 mb-6 pb-6 border-b border-slate-100">
-                    <span className="text-4xl font-black text-[#001f3f]">{plan.price}</span>
-                    <span className="text-slate-400 font-bold text-xs">/month</span>
-                  </div>
-
-                  {/* Features */}
-                  <ul className="space-y-3 mb-8 flex-1">
-                    <li className="flex items-center gap-2 text-xs font-black text-sky-600 uppercase tracking-wide">
-                      <FaCalendarAlt className="shrink-0" />
-                      {plan.duration}
-                    </li>
-                    <li className="flex items-start gap-3 text-sm font-semibold text-slate-600 leading-relaxed">
-                      <FaCheck className="text-green-500 text-[10px] mt-1 shrink-0" />
-                      <span>{plan.desc}</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm font-semibold text-slate-600">
-                      <FaCheck className="text-green-500 text-[10px] mt-1 shrink-0" />
-                      <span>1-on-1 Personalized Sessions</span>
-                    </li>
-                    <li className="flex items-start gap-3 text-sm font-semibold text-slate-600">
-                      <FaCheck className="text-green-500 text-[10px] mt-1 shrink-0" />
-                      <span>Monthly Progress Report</span>
-                    </li>
-                  </ul>
-
-                  {/* CTA */}
-                  <a
-                    href="https://wa.me/923485654503"
-                    target="_blank"
-                    rel="noreferrer"
-                    className={`w-full py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest text-center transition-all duration-300 flex items-center justify-center gap-2 ${
-                      isPopular
-                        ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg shadow-orange-100 hover:shadow-orange-200 hover:-translate-y-0.5'
-                        : 'bg-slate-50 text-[#001f3f] border border-slate-200 hover:bg-slate-100'
+            <div className="divide-y-2 divide-slate-100">
+              {plans.map((item) => {
+                const price = getPrice(item);
+                return (
+                  <div
+                    key={item._id}
+                    className={`grid grid-cols-12 items-center px-8 py-6 transition-colors ${
+                      item.isPopular ? 'bg-orange-50/40' : 'hover:bg-slate-50/70'
                     }`}
                   >
-                    Get Started <FaWhatsapp size={13} />
-                  </a>
+                    {/* 1. Title & Schedule */}
+                    <div className="col-span-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl font-black text-[#001f3f]">{item.title}</span>
+                        {item.isPopular && (
+                          <span className="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <FaStar size={9} /> Popular
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm font-semibold text-slate-500 mt-1">{item.schedule}</div>
+                    </div>
 
+                    {/* 2. Duration Column */}
+                    <div className="col-span-2 text-center">
+                      <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl text-xs font-bold">
+                        <FaClock size={11} className="text-emerald-600" />
+                        {duration} Mins
+                      </span>
+                    </div>
+
+                    {/* 3. Monthly Classes */}
+                    <div className="col-span-2 text-center">
+                      <span className="text-lg font-bold text-slate-800">
+                        {item.classesPerMonth} Classes
+                      </span>
+                      <div className="text-xs text-slate-400 font-medium mt-0.5">per month</div>
+                    </div>
+
+                    {/* 4. Monthly Fee */}
+                    <div className="col-span-2 text-center">
+                      <span className="text-4xl font-black text-[#001f3f]">
+                        {currSymbol}{price}
+                      </span>
+                      <span className="text-xs font-bold text-slate-400 block mt-0.5">/ month</span>
+                    </div>
+
+                    {/* 5. CTA Button */}
+                    <div className="col-span-2 text-right">
+                      <a
+                        href={trialLink(item)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${
+                          item.isPopular
+                            ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                            : 'bg-[#001f3f] hover:bg-orange-600 text-white'
+                        }`}
+                      >
+                        Book Trial <FaWhatsapp size={16} />
+                      </a>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* ─── MOBILE STACKED BOXES VIEW ─── */}
+        <div className="md:hidden space-y-4 mb-10">
+          {plans.map((item) => {
+            const price = getPrice(item);
+            return (
+              <div
+                key={item._id}
+                className={`bg-white rounded-2xl border-2 p-6 shadow-sm ${
+                  item.isPopular ? 'border-orange-500 bg-orange-50/20' : 'border-slate-200'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-xl font-black text-[#001f3f]">{item.title}</span>
+                  {item.isPopular && (
+                    <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      Popular
+                    </span>
+                  )}
                 </div>
+
+                <div className="text-sm font-medium text-slate-500 mb-4">{item.schedule}</div>
+
+                <div className="flex items-center justify-between border-y-2 border-slate-100 py-3 mb-5">
+                  <div>
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-lg text-xs font-bold mb-1">
+                      <FaClock size={10} /> {duration} Mins Class
+                    </span>
+                    <div className="text-xs font-bold text-slate-500">
+                      {item.classesPerMonth} Classes / Month
+                    </div>
+                  </div>
+                  <div className="text-3xl font-black text-[#001f3f]">
+                    {currSymbol}{price}
+                    <span className="text-xs text-slate-400 font-bold ml-1">/mo</span>
+                  </div>
+                </div>
+
+                <a
+                  href={trialLink(item)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold text-white shadow-sm ${
+                    item.isPopular ? 'bg-orange-500' : 'bg-[#001f3f]'
+                  }`}
+                >
+                  Book 3-Day Free Trial <FaWhatsapp size={16} />
+                </a>
               </div>
             );
           })}
         </div>
 
-        {/* ROW 2: Weekend & Custom Plans */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-          {/* Weekend Card */}
-          <div className="group bg-white rounded-3xl p-7 border-2 border-emerald-100 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden relative">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-400 to-teal-500 rounded-t-3xl"></div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform duration-300">
-                <FaCalendarCheck size={28} />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-[#001f3f] font-black text-xl mb-1">Weekend Plan</h3>
-                <p className="text-emerald-600 font-black text-[10px] uppercase tracking-widest mb-2">Saturday & Sunday Only</p>
-                <p className="text-slate-500 text-sm font-medium leading-relaxed mb-4">
-                  Perfect for busy students and professionals. Intensive weekend sessions tailored to your pace.
-                </p>
-                <div className="flex items-center gap-4">
-                  <span className="text-2xl font-black text-[#001f3f]">
-                    $40<span className="text-xs text-slate-400 font-bold">/mo</span>
-                  </span>
-                  <a
-                    href="https://wa.me/923485654503"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="bg-emerald-500 text-white px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 transition-all flex items-center gap-2"
-                  >
-                    Enroll Now <FaWhatsapp size={12} />
-                  </a>
-                </div>
-              </div>
-            </div>
+        {/* ─── 3 CLEAR GUARANTEES ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-2 border-slate-200 bg-white rounded-2xl p-6 text-center shadow-sm">
+          <div>
+            <div className="text-orange-600 font-black text-lg">3-Day Free Trial</div>
+            <div className="text-xs text-slate-500 font-medium mt-0.5">Take trial classes before paying</div>
           </div>
-
-          {/* Custom Plan Card */}
-          <div className="group bg-[#001f3f] rounded-3xl p-7 border-2 border-dashed border-sky-500/40 shadow-2xl hover:-translate-y-1 transition-all duration-500 overflow-hidden relative">
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-sky-400 to-indigo-500 rounded-t-3xl"></div>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <div className="w-16 h-16 bg-sky-600 rounded-2xl flex items-center justify-center text-white shrink-0 group-hover:rotate-6 transition-transform duration-300 shadow-lg">
-                <FaUserEdit size={28} />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-white font-black text-xl mb-1">Custom Plan</h3>
-                <p className="text-orange-400 font-black text-[10px] uppercase tracking-widest mb-2 animate-pulse">Fully Personalized</p>
-                <p className="text-slate-300 text-sm font-medium leading-relaxed mb-4">
-                  <span className="text-white font-black">● Any Days</span> (Mon–Sun) &nbsp;
-                  <span className="text-white font-black">● Any Timing</span> (24/7 Available)
-                </p>
-                <a
-                  href="https://wa.me/923485654503"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="bg-white text-[#001f3f] px-5 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all inline-flex items-center gap-2"
-                >
-                  Let's Design It <FaWhatsapp size={12} />
-                </a>
-              </div>
-            </div>
+          <div className="border-y md:border-y-0 md:border-x border-slate-200 py-3 md:py-0">
+            <div className="text-[#001f3f] font-black text-lg">Free Admission</div>
+            <div className="text-xs text-slate-500 font-medium mt-0.5">Zero registration fee or setup charges</div>
           </div>
-
-        </div>
-
-        {/* ROW 3: Family Discount Banner */}
-        <div className="bg-gradient-to-r from-orange-50 via-white to-orange-50 border-2 border-orange-100 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-md">
-          <div className="flex items-center gap-5">
-            <div className="w-14 h-14 bg-white rounded-2xl shadow-md border border-orange-100 flex items-center justify-center text-orange-500 shrink-0">
-              <FaGift size={26} />
-            </div>
-            <div>
-              <h4 className="text-[#001f3f] font-black text-xl leading-none mb-1">Family Discount</h4>
-              <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-1">
-                Register 2+ Siblings & Save{' '}
-                <span className="text-orange-600 font-black">15% FLAT OFF</span>
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white px-8 py-3 rounded-2xl shadow-xl shadow-orange-100 font-black text-2xl italic">
-              15% OFF
-            </div>
-            <a
-              href="https://wa.me/923485654503"
-              target="_blank"
-              rel="noreferrer"
-              className="bg-[#001f3f] text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all flex items-center gap-2 shadow-md"
-            >
-              Claim Now <FaWhatsapp size={13} />
-            </a>
+          <div>
+            <div className="text-emerald-600 font-black text-lg">No Hidden Charges</div>
+            <div className="text-xs text-slate-500 font-medium mt-0.5">Simple fixed fee • Cancel or pause anytime</div>
           </div>
         </div>
 
