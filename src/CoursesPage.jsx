@@ -7,7 +7,7 @@ import {
   FaArrowRight, FaCalendarCheck, FaSearch, FaArrowLeft, FaHome
 } from 'react-icons/fa';
 
-import SEOEngine from '../SEO/SEOEngine';
+import SEOEngine from "../src/SEO/SEOEngine";
 
 const IconDictionary = {
   bookOpen: <FaBookOpen />,
