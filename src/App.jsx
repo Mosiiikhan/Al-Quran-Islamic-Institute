@@ -8,6 +8,7 @@ import {
   useLocation, 
   Outlet 
 } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import './App.css';
 
 // ─── CRITICAL CORE COMPONENTS (Eager Loaded for Instant Paint) ──────────────
@@ -185,6 +186,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
+      <Analytics />
       <Routes>
         
         {/* ─── PUBLIC USER ROUTES ─── */}
