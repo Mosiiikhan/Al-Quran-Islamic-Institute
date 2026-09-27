@@ -10,8 +10,9 @@ import {
 } from 'react-router-dom';
 import './App.css';
 
-// ─── 📊 VERCEL WEB ANALYTICS ────────────────────────────────────────────────
+// ─── 📊 VERCEL WEB ANALYTICS & SPEED INSIGHTS ───────────────────────────────
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 // ─── CRITICAL CORE COMPONENTS (Eager Loaded for Instant Paint) ──────────────
 import TopBar from './TopBar';
@@ -275,8 +276,9 @@ function App() {
 
       </Routes>
 
-      {/* ─── VERCEL ANALYTICS COMPONENT INJECTED ─── */}
+      {/* ─── VERCEL ANALYTICS & SPEED INSIGHTS ─── */}
       <Analytics />
+      <SpeedInsights />
     </Router>
   );
 }
