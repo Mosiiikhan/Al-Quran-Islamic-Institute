@@ -1,61 +1,67 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 import { FaWhatsapp, FaStar, FaClock } from 'react-icons/fa';
+
+// ─── STATIC PRICING PLANS (Zero Backend / Instant Load) ─────────────────────
+const STATIC_PLANS = [
+  {
+    _id: '1',
+    title: 'Weekend Classes',
+    schedule: 'Saturday & Sunday',
+    classesPerMonth: 8,
+    priceUSD30: 40,
+    priceGBP30: 32,
+    priceUSD45: 55,
+    priceGBP45: 44,
+    isPopular: false
+  },
+  {
+    _id: '2',
+    title: '2 Days / Week',
+    schedule: 'Any 2 Days (Mon - Fri)',
+    classesPerMonth: 8,
+    priceUSD30: 36,
+    priceGBP30: 29,
+    priceUSD45: 50,
+    priceGBP45: 40,
+    isPopular: false
+  },
+  {
+    _id: '3',
+    title: '3 Days / Week',
+    schedule: 'Any 3 Days (Mon - Fri)',
+    classesPerMonth: 12,
+    priceUSD30: 50,
+    priceGBP30: 40,
+    priceUSD45: 68,
+    priceGBP45: 54,
+    isPopular: true
+  },
+  {
+    _id: '4',
+    title: '5 Days / Week',
+    schedule: 'Monday to Friday',
+    classesPerMonth: 20,
+    priceUSD30: 80,
+    priceGBP30: 64,
+    priceUSD45: 110,
+    priceGBP45: 88,
+    isPopular: false
+  }
+];
 
 const FeeStructure = () => {
   const [currency, setCurrency] = useState('USD'); // 'USD' | 'GBP'
   const [duration, setDuration] = useState('30');   // '30' | '45'
-  const [plans, setPlans] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  const WHATSAPP = '923485654503';
-
-  useEffect(() => {
-    const fetchPlans = async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${API_BASE}/api/pricing/public-plans`);
-        if (res.data?.success && res.data.data.length > 0) {
-          setPlans(res.data.data);
-        } else {
-          // Fallback initial data
-          setPlans([
-            {
-              _id: '1', title: 'Weekend Classes', schedule: 'Saturday & Sunday', classesPerMonth: 8,
-              priceUSD30: 40, priceGBP30: 32, priceUSD45: 55, priceGBP45: 44, isPopular: false
-            },
-            {
-              _id: '2', title: '2 Days / Week', schedule: 'Any 2 Days (Mon - Fri)', classesPerMonth: 8,
-              priceUSD30: 36, priceGBP30: 29, priceUSD45: 50, priceGBP45: 40, isPopular: false
-            },
-            {
-              _id: '3', title: '3 Days / Week', schedule: 'Any 3 Days (Mon - Fri)', classesPerMonth: 12,
-              priceUSD30: 50, priceGBP30: 40, priceUSD45: 68, priceGBP45: 54, isPopular: true
-            },
-            {
-              _id: '4', title: '5 Days / Week', schedule: 'Monday to Friday', classesPerMonth: 20,
-              priceUSD30: 80, priceGBP30: 64, priceUSD45: 110, priceGBP45: 88, isPopular: false
-            }
-          ]);
-        }
-      } catch (err) {
-        console.error('Tuition plans fetch fail:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPlans();
-  }, [API_BASE]);
-
+  const WHATSAPP = '923485654503';[cite: 1]
   const currSymbol = currency === 'USD' ? '$' : '£';
 
   // 🎯 Dynamic price resolution according to both duration and currency toggles
   const getPrice = (item) => {
     if (duration === '30') {
-      return currency === 'USD' ? (item.priceUSD30 || item.priceUSD || 0) : (item.priceGBP30 || item.priceGBP || 0);
+      return currency === 'USD' ? item.priceUSD30 : item.priceGBP30;
     } else {
-      return currency === 'USD' ? (item.priceUSD45 || 0) : (item.priceGBP45 || 0);
+      return currency === 'USD' ? item.priceUSD45 : item.priceGBP45;
     }
   };
 
@@ -136,90 +142,86 @@ const FeeStructure = () => {
         </div>
 
         {/* ─── DESKTOP TABLE VIEW ─── */}
-        {loading ? (
-          <div className="py-20 text-center text-slate-500 font-bold">Loading Plans...</div>
-        ) : (
-          <div className="hidden md:block bg-white rounded-3xl border-2 border-slate-200 overflow-hidden shadow-sm mb-10">
-            <div className="grid grid-cols-12 bg-[#001f3f] text-white px-8 py-5 text-sm font-bold uppercase tracking-wider">
-              <div className="col-span-4">Plan / Days</div>
-              <div className="col-span-2 text-center">Class Time</div>
-              <div className="col-span-2 text-center">Monthly Classes</div>
-              <div className="col-span-2 text-center">Monthly Fee</div>
-              <div className="col-span-2 text-right">Free Trial</div>
-            </div>
-
-            <div className="divide-y-2 divide-slate-100">
-              {plans.map((item) => {
-                const price = getPrice(item);
-                return (
-                  <div
-                    key={item._id}
-                    className={`grid grid-cols-12 items-center px-8 py-6 transition-colors ${
-                      item.isPopular ? 'bg-orange-50/40' : 'hover:bg-slate-50/70'
-                    }`}
-                  >
-                    {/* 1. Title & Schedule */}
-                    <div className="col-span-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl font-black text-[#001f3f]">{item.title}</span>
-                        {item.isPopular && (
-                          <span className="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                            <FaStar size={9} /> Popular
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm font-semibold text-slate-500 mt-1">{item.schedule}</div>
-                    </div>
-
-                    {/* 2. Duration Column */}
-                    <div className="col-span-2 text-center">
-                      <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl text-xs font-bold">
-                        <FaClock size={11} className="text-emerald-600" />
-                        {duration} Mins
-                      </span>
-                    </div>
-
-                    {/* 3. Monthly Classes */}
-                    <div className="col-span-2 text-center">
-                      <span className="text-lg font-bold text-slate-800">
-                        {item.classesPerMonth} Classes
-                      </span>
-                      <div className="text-xs text-slate-400 font-medium mt-0.5">per month</div>
-                    </div>
-
-                    {/* 4. Monthly Fee */}
-                    <div className="col-span-2 text-center">
-                      <span className="text-4xl font-black text-[#001f3f]">
-                        {currSymbol}{price}
-                      </span>
-                      <span className="text-xs font-bold text-slate-400 block mt-0.5">/ month</span>
-                    </div>
-
-                    {/* 5. CTA Button */}
-                    <div className="col-span-2 text-right">
-                      <a
-                        href={trialLink(item)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${
-                          item.isPopular
-                            ? 'bg-orange-500 hover:bg-orange-600 text-white'
-                            : 'bg-[#001f3f] hover:bg-orange-600 text-white'
-                        }`}
-                      >
-                        Book Trial <FaWhatsapp size={16} />
-                      </a>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+        <div className="hidden md:block bg-white rounded-3xl border-2 border-slate-200 overflow-hidden shadow-sm mb-10">
+          <div className="grid grid-cols-12 bg-[#001f3f] text-white px-8 py-5 text-sm font-bold uppercase tracking-wider">
+            <div className="col-span-4">Plan / Days</div>
+            <div className="col-span-2 text-center">Class Time</div>
+            <div className="col-span-2 text-center">Monthly Classes</div>
+            <div className="col-span-2 text-center">Monthly Fee</div>
+            <div className="col-span-2 text-right">Free Trial</div>
           </div>
-        )}
+
+          <div className="divide-y-2 divide-slate-100">
+            {STATIC_PLANS.map((item) => {
+              const price = getPrice(item);
+              return (
+                <div
+                  key={item._id}
+                  className={`grid grid-cols-12 items-center px-8 py-6 transition-colors ${
+                    item.isPopular ? 'bg-orange-50/40' : 'hover:bg-slate-50/70'
+                  }`}
+                >
+                  {/* 1. Title & Schedule */}
+                  <div className="col-span-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl font-black text-[#001f3f]">{item.title}</span>
+                      {item.isPopular && (
+                        <span className="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                          <FaStar size={9} /> Popular
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm font-semibold text-slate-500 mt-1">{item.schedule}</div>
+                  </div>
+
+                  {/* 2. Duration Column */}
+                  <div className="col-span-2 text-center">
+                    <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1 rounded-xl text-xs font-bold">
+                      <FaClock size={11} className="text-emerald-600" />
+                      {duration} Mins
+                    </span>
+                  </div>
+
+                  {/* 3. Monthly Classes */}
+                  <div className="col-span-2 text-center">
+                    <span className="text-lg font-bold text-slate-800">
+                      {item.classesPerMonth} Classes
+                    </span>
+                    <div className="text-xs text-slate-400 font-medium mt-0.5">per month</div>
+                  </div>
+
+                  {/* 4. Monthly Fee */}
+                  <div className="col-span-2 text-center">
+                    <span className="text-4xl font-black text-[#001f3f]">
+                      {currSymbol}{price}
+                    </span>
+                    <span className="text-xs font-bold text-slate-400 block mt-0.5">/ month</span>
+                  </div>
+
+                  {/* 5. CTA Button */}
+                  <div className="col-span-2 text-right">
+                    <a
+                      href={trialLink(item)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${
+                        item.isPopular
+                          ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                          : 'bg-[#001f3f] hover:bg-orange-600 text-white'
+                      }`}
+                    >
+                      Book Trial <FaWhatsapp size={16} />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
 
         {/* ─── MOBILE STACKED BOXES VIEW ─── */}
         <div className="md:hidden space-y-4 mb-10">
-          {plans.map((item) => {
+          {STATIC_PLANS.map((item) => {
             const price = getPrice(item);
             return (
               <div
