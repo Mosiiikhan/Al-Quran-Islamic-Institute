@@ -53,7 +53,7 @@ const FeeStructure = () => {
   const [currency, setCurrency] = useState('USD'); // 'USD' | 'GBP'
   const [duration, setDuration] = useState('30');   // '30' | '45'
 
-  const WHATSAPP = '923485654503';[cite: 1]
+  const WHATSAPP = '923485654503';
   const currSymbol = currency === 'USD' ? '$' : '£';
 
   // 🎯 Dynamic price resolution according to both duration and currency toggles
