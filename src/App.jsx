@@ -10,6 +10,9 @@ import {
 } from 'react-router-dom';
 import './App.css';
 
+// ─── 📊 VERCEL WEB ANALYTICS ────────────────────────────────────────────────
+import { Analytics } from '@vercel/analytics/react';
+
 // ─── CRITICAL CORE COMPONENTS (Eager Loaded for Instant Paint) ──────────────
 import TopBar from './TopBar';
 import Navbar from './NavBar';
@@ -28,10 +31,8 @@ import ContactUs from './ContactUs';
 import BlogSection from './BlogSection';
 
 // ─── 🚀 SEO, AEO & GEO IMPORTS ──────────────────────────────────────────────
-
 import { homeSEO } from './SEO/homeSEO';
 import SEOEngine from './SEO/SEOEngine';
-
 
 // ─── CODE SPLITTING (Matching Current Folder Structure) ─────────────────────
 const CoursesPage = lazy(() => import('./CoursesPage'));
@@ -124,8 +125,8 @@ const PublicLayout = ({ targetedCourse, isFormOpen, onOpenForm, onCloseForm }) =
       {/* Floating Free Trial Registration Form Modal */}
       <FloatingRegister 
         selectedCourseName={targetedCourse}
-        isExplicitOpen={isFormOpen}
-        onExplicitClose={onCloseForm}
+        isFormOpen={isFormOpen}
+        onCloseForm={onCloseForm}
       />
 
       {/* Floating Direct WhatsApp Support */}
@@ -273,6 +274,9 @@ function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
 
       </Routes>
+
+      {/* ─── VERCEL ANALYTICS COMPONENT INJECTED ─── */}
+      <Analytics />
     </Router>
   );
 }
