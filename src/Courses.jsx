@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
   FaBookOpen, FaMicrophoneAlt, FaHeart, FaStar, 
@@ -30,50 +29,101 @@ const generateSlug = (title = '') => {
     .replace(/^-+|-+$/g, '');
 };
 
-const Courses = ({ isHomePage = false, onDirectRegisterTrigger = null }) => {
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        // Agar homepage ho to featured courses load kare, warna all
-        const endpoint = isHomePage 
-          ? `${API_BASE}/api/admin/courses?featured=true` 
-          : `${API_BASE}/api/admin/courses`;
-
-        const res = await axios.get(endpoint);
-        const arrayData = res.data?.data || res.data;
-        if (Array.isArray(arrayData)) {
-          setCourses(arrayData);
-        } else {
-          setCourses([]);
-        }
-      } catch (err) {
-        console.error("Public courses fetch error:", err);
-        setCourses([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCourses();
-  }, [API_BASE, isHomePage]);
-
-  if (loading) {
-    return (
-      <div className="py-24 flex flex-col items-center justify-center gap-4 bg-[#f8faff]">
-        <div className="w-12 h-12 rounded-full border-4 border-orange-200 border-t-orange-500 animate-spin"></div>
-        <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Loading Programs...</p>
-      </div>
-    );
+// ─── STATIC COURSES DATA (Zero Backend / High Performance) ──────────────────
+export const STATIC_COURSES = [
+  {
+    _id: "course-1",
+    title: "Noorani Qaida for Beginners",
+    slug: "noorani-qaida-for-beginners",
+    desc: "Essential foundation course covering Arabic alphabets, letter recognition, correct pronunciation, and basic phonetic rules for kids and absolute beginners.",
+    level: "Beginner",
+    duration: "3 - 6 Months",
+    price: "Custom Schedule",
+    iconKey: "bookOpen",
+    color: "from-amber-500 to-orange-600"
+  },
+  {
+    _id: "course-2",
+    title: "Quran Reading with Tajweed",
+    slug: "quran-reading-with-tajweed",
+    desc: "Learn to recite the Holy Quran smoothly with accurate application of Tajweed rules, Makharij articulation, and correct rhythm under certified tutors.",
+    level: "All Levels",
+    duration: "6 - 12 Months",
+    price: "Custom Schedule",
+    iconKey: "microphone",
+    color: "from-teal-500 to-emerald-700"
+  },
+  {
+    _id: "course-3",
+    title: "Quran Memorization (Hifz)",
+    slug: "online-quran-memorization-hifz",
+    desc: "Structured full or partial Hifz program with systematic daily revision (Dour), personalized target milestones, and dedicated one-on-one Huffaz guidance.",
+    level: "Intermediate+",
+    duration: "2 - 3 Years",
+    price: "Custom Schedule",
+    iconKey: "heart",
+    color: "from-blue-600 to-indigo-800"
+  },
+  {
+    _id: "course-4",
+    title: "Quran Recitation with Tarteel",
+    slug: "quran-recitation-with-tarteel",
+    desc: "Master melodic recitation with measured rhythm, precise pauses (Waqf rules), and beautiful voice modulation following classical Qira'at traditions.",
+    level: "Intermediate",
+    duration: "4 - 8 Months",
+    price: "Custom Schedule",
+    iconKey: "star",
+    color: "from-rose-500 to-red-700"
+  },
+  {
+    _id: "course-5",
+    title: "Quran Translation & Tafseer",
+    slug: "quran-translation-and-tafseer",
+    desc: "In-depth word-by-word Urdu/English translation along with contextual historical background, practical life lessons, and scholarly explanations.",
+    level: "All Levels",
+    duration: "1 - 2 Years",
+    price: "Custom Schedule",
+    iconKey: "layerGroup",
+    color: "from-purple-600 to-indigo-900"
+  },
+  {
+    _id: "course-6",
+    title: "Quranic Arabic & Grammar",
+    slug: "quranic-arabic-language-course",
+    desc: "Understand the language of the Quran directly. Learn essential Arabic vocabulary, Nahw (grammar), and Sarf (morphology) designed for non-Arabs.",
+    level: "Intermediate",
+    duration: "6 - 12 Months",
+    price: "Custom Schedule",
+    iconKey: "language",
+    color: "from-cyan-600 to-blue-700"
+  },
+  {
+    _id: "course-7",
+    title: "Islamic Studies for Kids",
+    slug: "islamic-studies-for-kids",
+    desc: "Nurturing fundamental Islamic values: daily Masnoon Duas, Six Kalimahs, step-by-step Namaz/Salah practice, Seerah stories, and Islamic manners (Adab).",
+    level: "Kids (4-14 Yrs)",
+    duration: "Continuous",
+    price: "Custom Schedule",
+    iconKey: "bookReader",
+    color: "from-emerald-500 to-teal-700"
+  },
+  {
+    _id: "course-8",
+    title: "Ten Qira'at Specialization",
+    slug: "ten-qiraat-specialization-course",
+    desc: "Advanced certification course in authentic Qira'at variants (Hafs, Warsh, Qalun) with authorized Sanad for accomplished reciters and Huffaz.",
+    level: "Advanced",
+    duration: "1 - 2 Years",
+    price: "Custom Schedule",
+    iconKey: "moon",
+    color: "from-slate-700 to-slate-900"
   }
+];
 
-  const safeCourses = Array.isArray(courses) ? courses : [];
-
-  // Agar homepage hai to pehle 4 featured courses display honge
-  const displayedCourses = isHomePage ? safeCourses.slice(0, 4) : safeCourses;
+const Courses = ({ isHomePage = false, onDirectRegisterTrigger = null }) => {
+  // Homepage par top 4 featured tracks, dedicated /courses par complete catalog
+  const displayedCourses = isHomePage ? STATIC_COURSES.slice(0, 4) : STATIC_COURSES;
 
   return (
     <>
@@ -203,7 +253,7 @@ const Courses = ({ isHomePage = false, onDirectRegisterTrigger = null }) => {
           </div>
 
           {/* Homepage Bottom CTA: Route to Full Catalog */}
-          {isHomePage && safeCourses.length >= 4 && (
+          {isHomePage && STATIC_COURSES.length > 4 && (
             <div className="mt-14 text-center">
               <Link
                 to="/courses"
