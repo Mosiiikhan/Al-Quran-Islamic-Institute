@@ -1,26 +1,26 @@
 export const contactUsSEO = {
-  title: "Contact Us & Book Free Trial | Al Quran Islamic Institute",
+  title: "Al Quran Islamic Institute | Online Quran & Tajweed Classes Worldwide",
   description: "Get in touch with Al Quran Islamic Institute. Register for 3-day free trial Quran classes or contact our global academic support team via WhatsApp and email.",
-  canonicalUrl: "https://alquranislamicinstitute.com/contact-us",
+  canonicalUrl: "https://www.alquranislamic.com/contact-us",
   keywords: "contact quran academy, book free quran trial, quran tutor whatsapp number, online quran customer support",
-  ogImage: "https://alquranislamicinstitute.com/logo.jpeg",
+  ogImage: "https://www.alquranislamic.com/logo.jpeg",
 
   schema: {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "ContactPage",
-        "@id": "https://alquranislamicinstitute.com/contact-us/#webpage",
-        "url": "https://alquranislamicinstitute.com/contact-us",
+        "@id": "https://www.alquranislamic.com/contact-us/#webpage",
+        "url": "https://www.alquranislamic.com/contact-us",
         "name": "Contact Al Quran Islamic Institute",
         "description": "Direct communication channels and free trial registration portal for Al Quran Islamic Institute."
       },
       {
         "@type": "EducationalOrganization",
-        "@id": "https://alquranislamicinstitute.com/#organization",
+        "@id": "https://www.alquranislamic.com/#organization",
         "name": "Al Quran Islamic Institute",
-        "url": "https://alquranislamicinstitute.com",
-        "logo": "https://alquranislamicinstitute.com/logo.jpeg",
+        "url": "https://www.alquranislamic.com",
+        "logo": "https://www.alquranislamic.com/logo.jpeg",
         "contactPoint": [
           {
             "@type": "ContactPoint",
