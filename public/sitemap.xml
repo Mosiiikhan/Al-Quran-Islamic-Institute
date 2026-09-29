@@ -1,36 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- 1. Homepage -->
   <url>
-    <loc>https://alquranislamic.com/</loc>
+    <loc>https://www.alquranislamic.com/</loc>
     <lastmod>2026-09-28</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
   </url>
 
-  <!-- 2. Courses Catalog -->
   <url>
-    <loc>https://alquranislamic.com/courses</loc>
+    <loc>https://www.alquranislamic.com/courses</loc>
     <lastmod>2026-09-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
   </url>
 
-  <!-- 3. About CEO / Owner -->
   <url>
     <loc>https://www.alquranislamic.com/about-ceo</loc>
     <lastmod>2026-09-28</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
 
-  <!-- 4. Blogs Catalog -->
   <url>
-    <loc>https://alquranislamic.com/blogs</loc>
+    <loc>https://www.alquranislamic.com/blogs</loc>
     <lastmod>2026-09-28</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
   </url>
 
 </urlset>

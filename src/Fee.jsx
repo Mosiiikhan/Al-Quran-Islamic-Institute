@@ -1,50 +1,58 @@
 import React, { useState } from 'react';
-import { FaWhatsapp, FaStar, FaClock } from 'react-icons/fa';
+import { FaWhatsapp, FaStar, FaClock, FaCheckCircle, FaShieldAlt } from 'react-icons/fa';
 
-// ─── STATIC PRICING PLANS (Zero Backend / Instant Load) ─────────────────────
+// ─── MASTER STATIC PRICING PLANS ──────────────────────────────────────────
 const STATIC_PLANS = [
   {
-    _id: '1',
-    title: 'Weekend Classes',
-    schedule: 'Saturday & Sunday',
-    classesPerMonth: 8,
-    priceUSD30: 40,
-    priceGBP30: 32,
-    priceUSD45: 55,
-    priceGBP45: 44,
-    isPopular: false
-  },
-  {
     _id: '2',
-    title: '2 Days / Week',
-    schedule: 'Any 2 Days (Mon - Fri)',
-    classesPerMonth: 8,
-    priceUSD30: 36,
-    priceGBP30: 29,
-    priceUSD45: 50,
-    priceGBP45: 40,
+    title: '3 Days / Week',
+    badge: 'Best value',
+    badgeColor: 'bg-orange-500 text-white',
+    schedule: 'Mon, Wed, Fri (Or Any 3 Days)',
+    classesPerMonth: 12,
+    priceUSD30: 30,
+    priceGBP30: 25,
+    priceUSD45: 40,
+    priceGBP45: 30,
     isPopular: false
   },
   {
     _id: '3',
-    title: '3 Days / Week',
-    schedule: 'Any 3 Days (Mon - Fri)',
-    classesPerMonth: 12,
+    title: '5 Days / Week',
+    badge: 'Most Popular',
+    badgeColor: 'bg-emerald-600 text-white',
+    schedule: 'Monday to Friday',
+    classesPerMonth: 20,
     priceUSD30: 50,
     priceGBP30: 40,
-    priceUSD45: 68,
-    priceGBP45: 54,
+    priceUSD45: 60,
+    priceGBP45: 48,
     isPopular: true
   },
   {
     _id: '4',
-    title: '5 Days / Week',
-    schedule: 'Monday to Friday',
-    classesPerMonth: 20,
-    priceUSD30: 80,
-    priceGBP30: 64,
-    priceUSD45: 110,
-    priceGBP45: 88,
+    title: 'Weekend Classes',
+    badge: 'Saturday & Sunday',
+    badgeColor: 'bg-blue-600 text-white',
+    schedule: 'Saturday & Sunday Only',
+    classesPerMonth: 8,
+    priceUSD30: 30,
+    priceGBP30: 24,
+    priceUSD45: 40,
+    priceGBP45: 32,
+    isPopular: false
+  },
+  {
+    _id: '1',
+    title: '2 Days / Week',
+    badge: 'Flexible',
+    badgeColor: 'bg-slate-700 text-white',
+    schedule: 'Any 2 Days (Mon - Fri)',
+    classesPerMonth: 8,
+    priceUSD30: 25,
+    priceGBP30: 20,
+    priceUSD45: 35,
+    priceGBP45: 28,
     isPopular: false
   }
 ];
@@ -56,7 +64,7 @@ const FeeStructure = () => {
   const WHATSAPP = '923485654503';
   const currSymbol = currency === 'USD' ? '$' : '£';
 
-  // 🎯 Dynamic price resolution according to both duration and currency toggles
+  // 🎯 Instant price resolution based on user toggles
   const getPrice = (item) => {
     if (duration === '30') {
       return currency === 'USD' ? item.priceUSD30 : item.priceGBP30;
@@ -67,31 +75,43 @@ const FeeStructure = () => {
 
   const trialLink = (item) =>
     `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(
-      `Assalam-o-Alaikum, I want to book a 3-Day Free Trial for ${item.title} (${duration} Mins/Class, ${currSymbol}${getPrice(item)}/month).`
+      `Assalam-o-Alaikum Al-Quran Institute, I want to book a 3-Day Free Trial for the "${item.title}" plan (${duration} Mins/Class, ${currSymbol}${getPrice(item)}/month).`
     )}`;
 
   return (
-    <section id="fee-section" className="py-16 md:py-24 bg-[#f8faff] font-sans">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <section id="fee-section" className="py-12 sm:py-16 md:py-24 bg-[#f8faff] font-sans relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-0 right-1/4 w-72 h-72 bg-orange-100/50 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-0 left-1/4 w-72 h-72 bg-sky-100/50 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
 
         {/* ─── HEADER ─── */}
-        <div className="text-center max-w-3xl mx-auto mb-10 md:mb-12">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#001f3f] tracking-tight mb-3">
+        <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
+          <div className="inline-flex items-center gap-2 mb-2 sm:mb-3">
+            <span className="h-[2px] w-6 sm:w-8 bg-orange-500 rounded-full"></span>
+            <span className="text-orange-500 text-[10px] sm:text-xs font-black uppercase tracking-[0.25em]">
+              Affordable Quran Tutoring
+            </span>
+            <span className="h-[2px] w-6 sm:w-8 bg-orange-500 rounded-full"></span>
+          </div>
+
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-[#001f3f] tracking-tight mb-2 sm:mb-3">
             Tuition Fee Plans
           </h2>
-          <p className="text-slate-600 text-base sm:text-lg font-medium">
-            3-Day Free Trial • Free Admission • No Hidden Charges
+          <p className="text-slate-600 text-xs sm:text-base font-medium">
+            3-Day Free Trial • Free Admission • Cancel or Pause Anytime
           </p>
 
-          {/* ─── DUAL SWITCHER: CURRENCY & CLASS TIME ─── */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mt-7">
+          {/* ─── SWITCHERS: CURRENCY & TIME ─── */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-6">
             
-            {/* Currency Toggle */}
-            <div className="inline-flex items-center bg-white p-1 rounded-2xl border-2 border-slate-200 shadow-sm">
+            {/* Currency Switcher */}
+            <div className="inline-flex items-center bg-white p-1 rounded-2xl border border-slate-200 shadow-sm w-full sm:w-auto justify-center">
               <button
                 type="button"
                 onClick={() => setCurrency('USD')}
-                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-95 ${
                   currency === 'USD'
                     ? 'bg-[#001f3f] text-white shadow-md'
                     : 'text-slate-600 hover:text-slate-900'
@@ -102,7 +122,7 @@ const FeeStructure = () => {
               <button
                 type="button"
                 onClick={() => setCurrency('GBP')}
-                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-95 ${
                   currency === 'GBP'
                     ? 'bg-[#001f3f] text-white shadow-md'
                     : 'text-slate-600 hover:text-slate-900'
@@ -112,29 +132,29 @@ const FeeStructure = () => {
               </button>
             </div>
 
-            {/* Duration Toggle (30 Mins vs 45 Mins) */}
-            <div className="inline-flex items-center bg-white p-1 rounded-2xl border-2 border-slate-200 shadow-sm">
+            {/* Duration Switcher (30 Mins vs 45 Mins) */}
+            <div className="inline-flex items-center bg-white p-1 rounded-2xl border border-slate-200 shadow-sm w-full sm:w-auto justify-center">
               <button
                 type="button"
                 onClick={() => setDuration('30')}
-                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${
+                className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
                   duration === '30'
                     ? 'bg-orange-500 text-white shadow-md'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <FaClock size={13} /> 30 Mins / Class
+                <FaClock size={12} /> 30 Mins / Class
               </button>
               <button
                 type="button"
                 onClick={() => setDuration('45')}
-                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-1.5 ${
+                className={`flex-1 sm:flex-none px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
                   duration === '45'
                     ? 'bg-orange-500 text-white shadow-md'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <FaClock size={13} /> 45 Mins / Class
+                <FaClock size={12} /> 45 Mins / Class
               </button>
             </div>
 
@@ -142,36 +162,36 @@ const FeeStructure = () => {
         </div>
 
         {/* ─── DESKTOP TABLE VIEW ─── */}
-        <div className="hidden md:block bg-white rounded-3xl border-2 border-slate-200 overflow-hidden shadow-sm mb-10">
-          <div className="grid grid-cols-12 bg-[#001f3f] text-white px-8 py-5 text-sm font-bold uppercase tracking-wider">
-            <div className="col-span-4">Plan / Days</div>
-            <div className="col-span-2 text-center">Class Time</div>
-            <div className="col-span-2 text-center">Monthly Classes</div>
-            <div className="col-span-2 text-center">Monthly Fee</div>
+        <div className="hidden md:block bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm mb-10">
+          <div className="grid grid-cols-12 bg-[#001f3f] text-white px-8 py-5 text-xs font-bold uppercase tracking-wider">
+            <div className="col-span-4">Plan / Weekly Days</div>
+            <div className="col-span-2 text-center">Class Duration</div>
+            <div className="col-span-2 text-center">Monthly Sessions</div>
+            <div className="col-span-2 text-center">Monthly Tuition</div>
             <div className="col-span-2 text-right">Free Trial</div>
           </div>
 
-          <div className="divide-y-2 divide-slate-100">
+          <div className="divide-y divide-slate-100">
             {STATIC_PLANS.map((item) => {
               const price = getPrice(item);
               return (
                 <div
                   key={item._id}
                   className={`grid grid-cols-12 items-center px-8 py-6 transition-colors ${
-                    item.isPopular ? 'bg-orange-50/40' : 'hover:bg-slate-50/70'
+                    item.isPopular ? 'bg-orange-50/30' : 'hover:bg-slate-50/70'
                   }`}
                 >
                   {/* 1. Title & Schedule */}
                   <div className="col-span-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl font-black text-[#001f3f]">{item.title}</span>
-                      {item.isPopular && (
-                        <span className="bg-orange-500 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                          <FaStar size={9} /> Popular
+                      <span className="text-lg font-black text-[#001f3f]">{item.title}</span>
+                      {item.badge && (
+                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full ${item.badgeColor}`}>
+                          {item.badge}
                         </span>
                       )}
                     </div>
-                    <div className="text-sm font-semibold text-slate-500 mt-1">{item.schedule}</div>
+                    <div className="text-xs font-semibold text-slate-500 mt-1">{item.schedule}</div>
                   </div>
 
                   {/* 2. Duration Column */}
@@ -184,18 +204,18 @@ const FeeStructure = () => {
 
                   {/* 3. Monthly Classes */}
                   <div className="col-span-2 text-center">
-                    <span className="text-lg font-bold text-slate-800">
+                    <span className="text-base font-bold text-slate-800">
                       {item.classesPerMonth} Classes
                     </span>
-                    <div className="text-xs text-slate-400 font-medium mt-0.5">per month</div>
+                    <div className="text-[11px] text-slate-400 font-medium">per month</div>
                   </div>
 
                   {/* 4. Monthly Fee */}
                   <div className="col-span-2 text-center">
-                    <span className="text-4xl font-black text-[#001f3f]">
+                    <span className="text-3xl font-black text-[#001f3f]">
                       {currSymbol}{price}
                     </span>
-                    <span className="text-xs font-bold text-slate-400 block mt-0.5">/ month</span>
+                    <span className="text-xs font-bold text-slate-400 block">/ month</span>
                   </div>
 
                   {/* 5. CTA Button */}
@@ -204,13 +224,13 @@ const FeeStructure = () => {
                       href={trialLink(item)}
                       target="_blank"
                       rel="noreferrer"
-                      className={`inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold transition-all shadow-sm ${
+                      className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-sm active:scale-95 ${
                         item.isPopular
-                          ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                          ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20'
                           : 'bg-[#001f3f] hover:bg-orange-600 text-white'
                       }`}
                     >
-                      Book Trial <FaWhatsapp size={16} />
+                      Book Trial <FaWhatsapp size={15} />
                     </a>
                   </div>
                 </div>
@@ -219,71 +239,82 @@ const FeeStructure = () => {
           </div>
         </div>
 
-        {/* ─── MOBILE STACKED BOXES VIEW ─── */}
-        <div className="md:hidden space-y-4 mb-10">
+        {/* ─── MOBILE STACKED CARDS VIEW ─── */}
+        <div className="md:hidden space-y-3.5 mb-8">
           {STATIC_PLANS.map((item) => {
             const price = getPrice(item);
             return (
               <div
                 key={item._id}
-                className={`bg-white rounded-2xl border-2 p-6 shadow-sm ${
-                  item.isPopular ? 'border-orange-500 bg-orange-50/20' : 'border-slate-200'
+                className={`bg-white rounded-2xl border p-5 shadow-sm transition-all ${
+                  item.isPopular ? 'border-orange-500 bg-orange-50/20 shadow-orange-100' : 'border-slate-200'
                 }`}
               >
+                {/* Title & Badge */}
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="text-xl font-black text-[#001f3f]">{item.title}</span>
-                  {item.isPopular && (
-                    <span className="bg-orange-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      Popular
+                  <span className="text-base font-black text-[#001f3f]">{item.title}</span>
+                  {item.badge && (
+                    <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${item.badgeColor}`}>
+                      {item.badge}
                     </span>
                   )}
                 </div>
 
-                <div className="text-sm font-medium text-slate-500 mb-4">{item.schedule}</div>
+                <div className="text-xs font-medium text-slate-500 mb-3">{item.schedule}</div>
 
-                <div className="flex items-center justify-between border-y-2 border-slate-100 py-3 mb-5">
+                {/* Info & Price Row */}
+                <div className="flex items-center justify-between border-y border-slate-100 py-2.5 mb-4">
                   <div>
-                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2.5 py-0.5 rounded-lg text-xs font-bold mb-1">
-                      <FaClock size={10} /> {duration} Mins Class
+                    <span className="inline-flex items-center gap-1 bg-emerald-50 text-emerald-800 border border-emerald-200 px-2 py-0.5 rounded-md text-[11px] font-bold mb-1">
+                      <FaClock size={9} /> {duration} Mins / Class
                     </span>
-                    <div className="text-xs font-bold text-slate-500">
-                      {item.classesPerMonth} Classes / Month
+                    <div className="text-[11px] font-bold text-slate-500">
+                      {item.classesPerMonth} Classes per month
                     </div>
                   </div>
-                  <div className="text-3xl font-black text-[#001f3f]">
-                    {currSymbol}{price}
-                    <span className="text-xs text-slate-400 font-bold ml-1">/mo</span>
+                  <div className="text-right">
+                    <span className="text-2xl font-black text-[#001f3f]">
+                      {currSymbol}{price}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold block">/ month</span>
                   </div>
                 </div>
 
+                {/* WhatsApp Button */}
                 <a
                   href={trialLink(item)}
                   target="_blank"
                   rel="noreferrer"
-                  className={`w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold text-white shadow-sm ${
-                    item.isPopular ? 'bg-orange-500' : 'bg-[#001f3f]'
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-white shadow-sm active:scale-95 transition-all ${
+                    item.isPopular ? 'bg-orange-500 hover:bg-orange-600' : 'bg-[#001f3f] hover:bg-orange-600'
                   }`}
                 >
-                  Book 3-Day Free Trial <FaWhatsapp size={16} />
+                  Book 3-Day Free Trial <FaWhatsapp size={15} />
                 </a>
               </div>
             );
           })}
         </div>
 
-        {/* ─── 3 CLEAR GUARANTEES ─── */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 border-2 border-slate-200 bg-white rounded-2xl p-6 text-center shadow-sm">
+        {/* ─── 3 ASSURANCES & FAMILY DISCOUNT ─── */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 border border-slate-200 bg-white rounded-2xl p-5 sm:p-6 text-center shadow-sm">
           <div>
-            <div className="text-orange-600 font-black text-lg">3-Day Free Trial</div>
-            <div className="text-xs text-slate-500 font-medium mt-0.5">Take trial classes before paying</div>
+            <div className="text-orange-600 font-black text-base sm:text-lg flex items-center justify-center gap-1.5">
+              <FaCheckCircle size={15} /> 3-Day Free Trial
+            </div>
+            <div className="text-xs text-slate-500 font-medium mt-0.5">Take trial classes before paying tuition</div>
           </div>
           <div className="border-y md:border-y-0 md:border-x border-slate-200 py-3 md:py-0">
-            <div className="text-[#001f3f] font-black text-lg">Free Admission</div>
-            <div className="text-xs text-slate-500 font-medium mt-0.5">Zero registration fee or setup charges</div>
+            <div className="text-[#001f3f] font-black text-base sm:text-lg flex items-center justify-center gap-1.5">
+              <FaStar size={14} className="text-amber-500" /> Free Admission
+            </div>
+            <div className="text-xs text-slate-500 font-medium mt-0.5">Zero registration or hidden setup charges</div>
           </div>
           <div>
-            <div className="text-emerald-600 font-black text-lg">No Hidden Charges</div>
-            <div className="text-xs text-slate-500 font-medium mt-0.5">Simple fixed fee • Cancel or pause anytime</div>
+            <div className="text-emerald-600 font-black text-base sm:text-lg flex items-center justify-center gap-1.5">
+              <FaShieldAlt size={14} /> 10% Family Discount
+            </div>
+            <div className="text-xs text-slate-500 font-medium mt-0.5">For 2 or more siblings enrolling together</div>
           </div>
         </div>
 

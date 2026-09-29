@@ -37,7 +37,7 @@ import SEOEngine from './SEO/SEOEngine';
 
 // ─── CODE SPLITTING (Matching Current Folder Structure) ─────────────────────
 const CoursesPage = lazy(() => import('./CoursesPage'));
-const CourseDetailPage = lazy(() => import('./assets/CourseDetailPage'));
+const CourseDetailPage = lazy(() => import('./CourseDetailPage'));
 
 // Admin Modules
 const AdminLogin = lazy(() => import('./assets/Admin/Adminlogin'));

@@ -1,4 +1,36 @@
+# ─── ALLOWED: AI SEARCH, SEARCH ENGINES, SOCIAL PREVIEWS ───
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: anthropic-ai
+User-agent: Google-Extended
+User-agent: Googlebot
+User-agent: Bingbot
+User-agent: Applebot
+User-agent: facebookexternalhit
+User-agent: Twitterbot
+User-agent: LinkedInBot
+User-agent: WhatsApp
+Allow: /
+
+# ─── BLOCKED: AGGRESSIVE SCRAPERS ───
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DotBot
+User-agent: MJ12bot
+User-agent: Rogerbot
+User-agent: BLEXBot
+User-agent: MegaIndex.ru
+User-agent: ZoominfoBot
+Disallow: /
+
+# ─── DEFAULT ───
 User-agent: *
 Allow: /
 
-Sitemap: https://alquranislamic.com/sitemap.xml
+Sitemap: https://www.alquranislamic.com/sitemap.xml

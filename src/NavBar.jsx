@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   FaHome, FaMoneyCheckAlt, FaChevronDown, FaChevronUp, 
   FaInfoCircle, FaEnvelope, FaImages, FaUserTie, 
-  FaUniversity, FaBloggerB, FaUsers, FaTimes, FaBars 
+  FaUniversity, FaBloggerB, FaUsers, FaTimes, FaBars, FaWhatsapp
 } from 'react-icons/fa';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LogoImg from './assets/logo.jpeg';
@@ -10,17 +10,29 @@ import LogoImg from './assets/logo.jpeg';
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false); // Mobile accordion state
+  const [aboutDropdownOpen, setAboutDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Scroll detection for shadow and glass blur
+  // Scroll detection for navbar styling
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 40);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Lock body scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [mobileMenuOpen]);
 
   // Route change par drawer band karna
   useEffect(() => {
@@ -29,23 +41,20 @@ const Navbar = () => {
   }, [location.pathname]);
 
   const bubbleLinkStyle =
-    "navPill group flex items-center gap-1.5 px-5 py-2.5 font-bold text-[#0A1F44] text-[13.5px] cursor-pointer";
+    "navPill group flex items-center gap-1.5 px-4 lg:px-5 py-2.5 font-bold text-[#0A1F44] text-[13px] lg:text-[13.5px] cursor-pointer";
 
   const dropdownLinkStyle =
-    "flex items-center gap-2 px-5 py-3 hover:bg-blue-50 text-gray-700 hover:text-[#0056b3] font-bold text-sm transition-all duration-200 border-b border-gray-50 last:border-0 w-full text-left";
+    "flex items-center gap-2.5 px-5 py-3 hover:bg-blue-50 text-gray-700 hover:text-[#0056b3] font-bold text-sm transition-all duration-200 border-b border-gray-50 last:border-0 w-full text-left";
 
   // Smooth Scroll Logic
   const scrollToSection = (id) => {
     const target = document.getElementById(id);
-    if (!target) {
-      console.warn(`Target section with id "${id}" not found.`);
-      return;
-    }
+    if (!target) return;
 
     const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 80;
     const startPosition = window.pageYOffset;
     const distance = targetPosition - startPosition;
-    const duration = 800;
+    const duration = 700;
     let start = null;
 
     window.requestAnimationFrame(function step(timestamp) {
@@ -64,7 +73,7 @@ const Navbar = () => {
     setMobileMenuOpen(false);
     if (location.pathname !== '/') {
       navigate('/');
-      setTimeout(() => scrollToSection(sectionId), 120);
+      setTimeout(() => scrollToSection(sectionId), 150);
     } else {
       scrollToSection(sectionId);
     }
@@ -76,7 +85,7 @@ const Navbar = () => {
       scrollToSection('blog-section');
     } else {
       navigate('/');
-      setTimeout(() => scrollToSection('blog-section'), 120);
+      setTimeout(() => scrollToSection('blog-section'), 150);
     }
   };
 
@@ -99,92 +108,64 @@ const Navbar = () => {
           background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(229,242,255,0.88));
           border: 1px solid rgba(77,163,255,0.4);
           box-shadow: 0 3px 0 rgba(31,111,212,0.18), 0 6px 14px rgba(10,31,68,0.12);
-          transition: transform 0.3s cubic-bezier(.4,0,.2,1), box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+          transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
           white-space: nowrap;
         }
         .navPill:hover {
-          transform: translateY(-3px);
+          transform: translateY(-2px);
           background: linear-gradient(180deg, rgba(255,255,255,1), rgba(204,229,255,0.95));
-          box-shadow: 0 5px 0 rgba(31,111,212,0.22), 0 14px 24px rgba(10,31,68,0.18);
+          box-shadow: 0 4px 0 rgba(31,111,212,0.22), 0 10px 20px rgba(10,31,68,0.16);
           color: #0056b3;
         }
         .navPill:active {
           transform: translateY(1px);
           box-shadow: 0 1px 0 rgba(31,111,212,0.18), 0 3px 8px rgba(10,31,68,0.12);
         }
-        .navPill::before, .navPill::after,
-        .ctaBubble::before, .ctaBubble::after {
-          content: '';
-          position: absolute;
-          bottom: 6px;
-          border-radius: 50%;
-          opacity: 0;
-          z-index: -1;
-          pointer-events: none;
-        }
-        .navPill::before { left: 18%; width: 8px; height: 8px; background: rgba(77,163,255,0.55); }
-        .navPill::after  { left: 65%; width: 6px; height: 6px; background: rgba(77,163,255,0.45); }
-        .ctaBubble::before { left: 20%; width: 8px; height: 8px; background: rgba(255,255,255,0.7); }
-        .ctaBubble::after  { left: 68%; width: 6px; height: 6px; background: rgba(255,255,255,0.55); }
-
-        .navPill:hover::before, .ctaBubble:hover::before { animation: bubbleFloat 0.9s ease-out; }
-        .navPill:hover::after,  .ctaBubble:hover::after  { animation: bubbleFloat 1.1s ease-out 0.12s; }
-
-        @keyframes bubbleFloat {
-          0%    { transform: translateY(0) scale(0.4); opacity: 0; }
-          25%   { opacity: 0.65; }
-          100% { transform: translateY(-26px) scale(1.15); opacity: 0; }
-        }
-
-        .ctaBubble {
-          position: relative;
-          isolation: isolate;
-          white-space: nowrap;
-        }
       `}</style>
 
+      {/* ─── DESKTOP & MOBILE HEADER BAR ─── */}
       <div
-        className={`sticky top-0 z-50 flex justify-center px-3 md:px-4 lg:px-6 transition-all duration-500 ${
-          scrolled ? 'pt-2' : 'pt-4'
+        className={`sticky top-0 z-50 flex justify-center px-2.5 sm:px-4 lg:px-6 transition-all duration-300 ${
+          scrolled ? 'pt-1.5' : 'pt-2.5 sm:pt-3.5'
         }`}
       >
         <nav
-          className={`w-full max-w-7xl flex items-center justify-between rounded-[28px] px-4 md:px-6 lg:px-10 py-2.5 border backdrop-blur-xl transition-all duration-500 ${
+          className={`w-full max-w-7xl flex items-center justify-between rounded-2xl sm:rounded-[28px] px-3.5 sm:px-6 lg:px-8 py-2 border backdrop-blur-xl transition-all duration-300 ${
             scrolled
-              ? 'bg-white/95 border-white/80 shadow-[0_14px_36px_rgba(10,31,68,0.22)]'
-              : 'bg-white/70 border-white/50 shadow-[0_8px_26px_rgba(10,31,68,0.12)]'
+              ? 'bg-white/95 border-white/80 shadow-[0_10px_30px_rgba(10,31,68,0.18)]'
+              : 'bg-white/80 border-white/60 shadow-[0_6px_22px_rgba(10,31,68,0.1)]'
           }`}
         >
-          {/* --- LOGO SECTION --- */}
+          {/* Logo Section */}
           <div
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer group"
             onClick={handleHomeClick}
           >
-            <div className="overflow-hidden rounded-lg">
+            <div className="overflow-hidden rounded-lg shrink-0">
               <img
                 src={LogoImg}
-                alt="Al Quran Institute"
-                className="h-11 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                alt="Al Quran Islamic Institute"
+                className="h-10 sm:h-12 md:h-13 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
               />
             </div>
             <div className="flex flex-col">
-              <h1 className="text-lg md:text-2xl font-black text-[#003366] leading-none tracking-tight">
+              <span className="text-base sm:text-xl font-black text-[#003366] leading-none tracking-tight">
                 AL QURAN
-              </h1>
-              <span className="text-[9px] md:text-[10px] font-bold text-orange-600 tracking-[0.2em] uppercase">
+              </span>
+              <span className="text-[8px] sm:text-[9.5px] font-bold text-orange-600 tracking-[0.18em] uppercase mt-0.5">
                 Islamic Institute
               </span>
             </div>
           </div>
 
-          {/* --- DESKTOP NAV LINKS --- */}
-          <div className="hidden md:flex items-center gap-1.5 lg:gap-2.5">
+          {/* Desktop Nav Items */}
+          <div className="hidden md:flex items-center gap-1 lg:gap-2">
             <button onClick={handleHomeClick} className={bubbleLinkStyle}>
               <FaHome className="text-[#0056b3] group-hover:scale-110 transition-transform" /> Home
             </button>
 
             <button onClick={() => handleNavClick('fee-section')} className={bubbleLinkStyle}>
-              <FaMoneyCheckAlt className="text-[#0056b3] group-hover:scale-110 transition-transform" /> Fee
+              <FaMoneyCheckAlt className="text-[#0056b3] group-hover:scale-110 transition-transform" /> Fee Plans
             </button>
 
             <button onClick={() => handleNavClick('gallery-section')} className={bubbleLinkStyle}>
@@ -197,157 +178,170 @@ const Navbar = () => {
 
             <button
               onClick={() => handleNavClick('courses-section')}
-              className="ctaBubble mx-1 bg-gradient-to-b from-[#4DA3FF] to-[#0056b3] text-white px-5 lg:px-7 py-2.5 rounded-full font-black uppercase text-[12px] tracking-wider border border-white/25 shadow-[0_4px_0_#003366,0_10px_20px_rgba(0,86,179,0.4)] hover:shadow-[0_6px_0_#003366,0_16px_28px_rgba(0,86,179,0.5)] hover:-translate-y-1 active:translate-y-1 active:shadow-[0_1px_0_#003366,0_4px_10px_rgba(0,86,179,0.4)] transition-all duration-300"
+              className="mx-1 bg-gradient-to-b from-[#4DA3FF] to-[#0056b3] text-white px-5 lg:px-6 py-2 rounded-full font-black uppercase text-xs tracking-wider border border-white/30 shadow-[0_3px_0_#003366,0_8px_16px_rgba(0,86,179,0.35)] hover:-translate-y-0.5 active:translate-y-0.5 transition-all"
             >
               Courses
             </button>
 
-            {/* ABOUT US DROPDOWN (DESKTOP: HOVER WITH 3 OPTIONS) */}
+            {/* Desktop Dropdown */}
             <div className="relative group">
               <button className={bubbleLinkStyle}>
                 <FaInfoCircle className="text-[#0056b3] group-hover:scale-110 transition-transform" />
                 About Us
-                <FaChevronDown size={10} className="mt-0.5 opacity-50 group-hover:rotate-180 transition-transform" />
+                <FaChevronDown size={10} className="mt-0.5 opacity-60 group-hover:rotate-180 transition-transform duration-200" />
               </button>
 
-              <div className="absolute top-full left-0 w-60 bg-white shadow-2xl rounded-2xl py-2 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:mt-2 transition-all duration-300 z-50">
+              <div className="absolute top-full left-0 w-56 bg-white shadow-2xl rounded-2xl py-1.5 border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-hover:mt-2 transition-all duration-200 z-50">
                 <button onClick={() => handleNavClick('about-academy')} className={dropdownLinkStyle}>
                   <FaUniversity className="text-orange-500" /> About Academy
                 </button>
-
-                {/* 🚀 FIXED: Seedha /about-ceo page par le jayega */}
-                <button 
-                  onClick={() => navigate('/about-ceo')} 
-                  className={dropdownLinkStyle}
-                >
-                  <FaUserTie className="text-blue-600" /> About CEO / Founder
+                <button onClick={() => navigate('/about-ceo')} className={dropdownLinkStyle}>
+                  <FaUserTie className="text-blue-600" /> CEO / Founder
                 </button>
-
                 <button onClick={() => handleNavClick('about-team')} className={dropdownLinkStyle}>
-                  <FaUsers className="text-emerald-600" /> Our Teachers & Faculty
+                  <FaUsers className="text-emerald-600" /> Teachers & Faculty
                 </button>
               </div>
             </div>
 
             <button onClick={() => handleNavClick('footer-section')} className={bubbleLinkStyle}>
-              <FaEnvelope className="text-[#0056b3] group-hover:scale-110 transition-transform" /> Contact Us
+              <FaEnvelope className="text-[#0056b3] group-hover:scale-110 transition-transform" /> Contact
             </button>
           </div>
 
-          {/* --- MOBILE HAMBURGER TOGGLE BUTTON --- */}
-          <button 
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle navigation"
-            className="md:hidden text-[#003366] hover:bg-blue-50/80 p-2.5 rounded-2xl transition-all focus:outline-none"
-          >
-            {mobileMenuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
-          </button>
+          {/* Mobile Right Quick Action & Hamburger */}
+          <div className="flex md:hidden items-center gap-2">
+            <a
+              href="https://wa.me/923485654503?text=Assalam-o-Alaikum%20Al-Quran%20Institute%2C%20I%20want%20to%20enroll%20in%20a%20Free%20Trial."
+              target="_blank"
+              rel="noreferrer"
+              className="bg-emerald-600 text-white p-2 rounded-xl active:scale-95 transition-transform"
+              aria-label="WhatsApp Us"
+            >
+              <FaWhatsapp size={17} />
+            </a>
+
+            <button 
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle navigation"
+              className="text-[#003366] bg-slate-100 hover:bg-slate-200/80 p-2 rounded-xl transition-all"
+            >
+              {mobileMenuOpen ? <FaTimes size={19} /> : <FaBars size={19} />}
+            </button>
+          </div>
         </nav>
       </div>
 
-      {/* --- MOBILE ACCORDION DRAWER --- */}
+      {/* ─── MOBILE BACKDROP & DRAWER ─── */}
       {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-x-3 top-20 z-40 bg-white/95 backdrop-blur-2xl rounded-3xl border-2 border-slate-200/80 shadow-2xl p-5 transition-all animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex flex-col gap-1.5">
+        <>
+          {/* Backdrop Blur Overlay */}
+          <div 
+            className="md:hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
 
-            <button
-              onClick={handleHomeClick}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-black text-[#001f3f] hover:bg-blue-50 text-left transition"
-            >
-              <FaHome className="text-[#0056b3]" /> Home
-            </button>
+          {/* Drawer Menu */}
+          <div className="md:hidden fixed inset-x-3.5 top-18 z-50 max-h-[82vh] overflow-y-auto bg-white rounded-3xl border border-slate-200/80 shadow-2xl p-4 transition-all">
+            <div className="flex flex-col gap-1 text-slate-800 font-bold text-sm">
 
-            <button
-              onClick={() => handleNavClick('courses-section')}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-black text-[#001f3f] hover:bg-blue-50 text-left transition"
-            >
-              <span className="w-2 h-2 rounded-full bg-orange-500"></span> Courses
-            </button>
-
-            <button
-              onClick={() => handleNavClick('fee-section')}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-black text-[#001f3f] hover:bg-blue-50 text-left transition"
-            >
-              <FaMoneyCheckAlt className="text-[#0056b3]" /> Tuition & Fees
-            </button>
-
-            <button
-              onClick={() => handleNavClick('gallery-section')}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-black text-[#001f3f] hover:bg-blue-50 text-left transition"
-            >
-              <FaImages className="text-[#0056b3]" /> Campus Gallery
-            </button>
-
-            <button
-              onClick={handleBlogsClick}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-black text-[#001f3f] hover:bg-blue-50 text-left transition"
-            >
-              <FaBloggerB className="text-[#0056b3]" /> Articles & Blogs
-            </button>
-
-            {/* ACCORDION COLLAPSIBLE: ABOUT US ON MOBILE */}
-            <div className="border-t border-slate-100 pt-1 mt-1">
               <button
-                onClick={() => setAboutDropdownOpen(!aboutDropdownOpen)}
-                className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-[15px] font-black text-[#001f3f] hover:bg-blue-50 transition"
+                onClick={handleHomeClick}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-left transition"
               >
-                <span className="flex items-center gap-3">
-                  <FaInfoCircle className="text-[#0056b3]" /> About Us
-                </span>
-                {aboutDropdownOpen ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+                <FaHome className="text-[#0056b3] text-base" /> Home
               </button>
 
-              {/* Sub-menu items inside Mobile Drawer */}
-              {aboutDropdownOpen && (
-                <div className="ml-4 pl-3 border-l-2 border-orange-200 my-1 flex flex-col gap-1">
-                  <button
-                    onClick={() => handleNavClick('about-academy')}
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold text-slate-700 hover:text-orange-600 rounded-lg hover:bg-orange-50/50 text-left"
-                  >
-                    <FaUniversity className="text-orange-500 text-xs" /> About Academy
-                  </button>
+              <button
+                onClick={() => handleNavClick('courses-section')}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-left transition text-orange-600 font-extrabold"
+              >
+                <span className="w-2.5 h-2.5 rounded-full bg-orange-500 animate-pulse"></span>
+                Our Quran Courses
+              </button>
 
-                  {/* 🚀 FIXED: Mobile Drawer se bhi seedha /about-ceo page par le jayega */}
-                  <button
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      navigate('/about-ceo');
-                    }}
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold text-slate-700 hover:text-blue-600 rounded-lg hover:bg-blue-50/50 text-left"
-                  >
-                    <FaUserTie className="text-blue-600 text-xs" /> About CEO / Founder
-                  </button>
+              <button
+                onClick={() => handleNavClick('fee-section')}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-left transition"
+              >
+                <FaMoneyCheckAlt className="text-[#0056b3] text-base" /> Tuition & Fees
+              </button>
 
-                  <button
-                    onClick={() => handleNavClick('about-team')}
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm font-bold text-slate-700 hover:text-emerald-600 rounded-lg hover:bg-emerald-50/50 text-left"
-                  >
-                    <FaUsers className="text-emerald-600 text-xs" /> Our Teachers & Faculty
-                  </button>
-                </div>
-              )}
+              <button
+                onClick={() => handleNavClick('gallery-section')}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-left transition"
+              >
+                <FaImages className="text-[#0056b3] text-base" /> Campus Gallery
+              </button>
+
+              <button
+                onClick={handleBlogsClick}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-left transition"
+              >
+                <FaBloggerB className="text-[#0056b3] text-base" /> Islamic Articles & Blogs
+              </button>
+
+              {/* Accordion: About Us */}
+              <div className="border-t border-slate-100 pt-1 mt-1">
+                <button
+                  onClick={() => setAboutDropdownOpen(!aboutDropdownOpen)}
+                  className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl hover:bg-blue-50 transition"
+                >
+                  <span className="flex items-center gap-3">
+                    <FaInfoCircle className="text-[#0056b3] text-base" /> About Us
+                  </span>
+                  {aboutDropdownOpen ? <FaChevronUp size={11} /> : <FaChevronDown size={11} />}
+                </button>
+
+                {aboutDropdownOpen && (
+                  <div className="ml-3 pl-3 border-l-2 border-orange-300 my-1 flex flex-col gap-1">
+                    <button
+                      onClick={() => handleNavClick('about-academy')}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-orange-600 rounded-lg text-left"
+                    >
+                      <FaUniversity className="text-orange-500" /> About Academy
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        navigate('/about-ceo');
+                      }}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-blue-600 rounded-lg text-left"
+                    >
+                      <FaUserTie className="text-blue-600" /> CEO / Founder Profile
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('about-team')}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-slate-700 hover:text-emerald-600 rounded-lg text-left"
+                    >
+                      <FaUsers className="text-emerald-600" /> Qualified Teachers & Scholars
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <button
+                onClick={() => handleNavClick('footer-section')}
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-blue-50 text-left transition border-t border-slate-100 mt-1"
+              >
+                <FaEnvelope className="text-[#0056b3] text-base" /> Contact Us
+              </button>
+
+              {/* Free Trial Button */}
+              <a
+                href="https://wa.me/923485654503?text=Assalam-o-Alaikum%20Al-Quran%20Institute%2C%20I%20want%20to%20book%20a%203-Day%20Free%20Trial%20for%20Quran%20Classes."
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2.5 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-xl font-extrabold text-xs uppercase tracking-wider shadow-md shadow-orange-500/25 active:scale-95 transition"
+              >
+                <FaWhatsapp size={16} />
+                Book 3-Day Free Trial
+              </a>
+
             </div>
-
-            <button
-              onClick={() => handleNavClick('footer-section')}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] font-black text-[#001f3f] hover:bg-blue-50 text-left transition border-t border-slate-100 mt-1"
-            >
-              <FaEnvelope className="text-[#0056b3]" /> Contact Us
-            </button>
-
-            {/* Trial CTA Button Inside Drawer */}
-            <a
-              href="https://wa.me/923485654503?text=Assalam-o-Alaikum%2C%20I%20want%20to%20book%20a%203-Day%20Free%20Trial."
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 text-center py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-2xl font-black text-sm uppercase tracking-wider shadow-lg shadow-orange-500/20 active:scale-95 transition"
-            >
-              Book 3-Day Free Trial
-            </a>
-
           </div>
-        </div>
+        </>
       )}
     </>
   );
