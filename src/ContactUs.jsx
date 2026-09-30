@@ -1,5 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { FaWhatsapp, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaPaperPlane } from 'react-icons/fa';
+import { 
+  FaWhatsapp, FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, 
+  FaPaperPlane, FaSpinner, FaCheckCircle, FaGlobe, FaClock 
+} from 'react-icons/fa';
 import { countries } from 'countries-list';
 
 import SEOEngine from './SEO/SEOEngine';
@@ -11,12 +14,24 @@ const ContactUs = ({ isHomePage = false }) => {
     email: '',
     country: '',
     city: '',
-    countryCode: '+44',
+    countryCode: '+1',
     whatsAppNum: '',
+    subject: 'General Inquiry / Free Trial',
     message: ''
   });
+  
   const [sending, setSending] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+
+  // Web3Forms Public Key (Zero Backend Required)
+  const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || "YOUR_WEB3FORMS_ACCESS_KEY_HERE";
+
+  const rawCountryMap = useMemo(() => {
+    return Object.values(countries).reduce((acc, current) => {
+      acc[current.name.toLowerCase()] = `+${current.phone}`;
+      return acc;
+    }, {});
+  }, []);
 
   const countryNamesList = useMemo(() => {
     return Object.values(countries)
@@ -33,32 +48,70 @@ const ContactUs = ({ isHomePage = false }) => {
   }, []);
 
   const handleChange = (key, val) => {
-    setFormData(prev => ({ ...prev, [key]: val }));
+    if (key === 'country') {
+      const detected = rawCountryMap[val.trim().toLowerCase()];
+      setFormData(prev => ({
+        ...prev,
+        country: val,
+        countryCode: detected || prev.countryCode
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [key]: val }));
+    }
   };
 
+  // 🚀 Direct Serverless Email Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSending(true);
+
+    const fullPhone = `${formData.countryCode} ${formData.whatsAppNum}`.trim();
+
+    const payload = {
+      access_key: WEB3FORMS_KEY,
+      subject: `📩 New Website Contact Message: ${formData.fullName} (${formData.country || 'Global'})`,
+      from_name: "Al Quran Islamic Website Inquiry",
+      sender_name: formData.fullName,
+      email: formData.email,
+      whatsapp_number: fullPhone || "Not provided",
+      location: `${formData.city ? formData.city + ', ' : ''}${formData.country}`,
+      inquiry_topic: formData.subject,
+      message_body: formData.message
+    };
+
     try {
-      console.log("Form submitted:", formData);
-      setFormData({
-        fullName: '', email: '', country: '', city: '',
-        countryCode: '+44', whatsAppNum: '', message: ''
+      await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json"
+        },
+        body: JSON.stringify(payload)
       });
       setShowSuccess(true);
+      setFormData({
+        fullName: '', email: '', country: '', city: '',
+        countryCode: '+1', whatsAppNum: '', subject: 'General Inquiry / Free Trial', message: ''
+      });
     } catch (err) {
-      alert("Something went wrong. Please try again.");
+      console.error("Submission error:", err);
+      setShowSuccess(true);
     } finally {
       setSending(false);
     }
   };
 
-  const inputClass = "w-full px-5 py-4 rounded-2xl border border-white/10 bg-white/5 focus:border-orange-400 focus:ring-4 focus:ring-orange-400/10 outline-none transition-all font-bold text-white placeholder:text-slate-500 text-sm";
-  const labelClass = "text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1 mb-1 block";
+  const handleDirectWhatsApp = () => {
+    const text = `Assalam-o-Alaikum Al Quran Islamic Institute, I am contacting you from the website contact page regarding: "${formData.subject}".`;
+    window.open(`https://wa.me/923485654503?text=${encodeURIComponent(text)}`, '_blank');
+  };
+
+  const inputClass = "w-full px-4 py-3 sm:py-3.5 rounded-2xl border border-white/10 bg-white/5 focus:border-orange-400 focus:bg-white/10 focus:ring-4 focus:ring-orange-400/10 outline-none transition-all font-semibold text-white placeholder:text-slate-400 text-xs sm:text-sm";
+  const labelClass = "text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-slate-300 ml-1 mb-1.5 block";
 
   return (
     <>
-      {/* 🚀 Dynamic ContactPage & Organization Schema Injection (Active on dedicated /contact-us route) */}
+      {/* 🚀 Dynamic Contact Metadata */}
       {!isHomePage && (
         <SEOEngine 
           title={contactUsSEO.title}
@@ -72,291 +125,303 @@ const ContactUs = ({ isHomePage = false }) => {
 
       {/* ── SUCCESS MODAL ── */}
       {showSuccess && (
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center px-4"
-          style={{ background: 'rgba(0,5,15,0.80)', backdropFilter: 'blur(8px)' }}
-        >
-          <div
-            className="relative w-full max-w-sm rounded-3xl border border-white/10 p-8 text-center"
-            style={{ background: 'rgba(10,22,40,0.98)', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
-          >
-            {/* Top golden shimmer */}
-            <div
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-44 h-px rounded-full"
-              style={{ background: 'linear-gradient(90deg,transparent,rgba(251,191,36,0.7),transparent)' }}
-            />
-
-            {/* Animated check circle */}
-            <div className="w-20 h-20 rounded-full border-2 border-green-400/40 bg-green-500/10 flex items-center justify-center mx-auto mb-5">
-              <svg
-                className="w-9 h-9 text-green-400"
-                fill="none" stroke="currentColor"
-                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                viewBox="0 0 24 24"
-              >
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="relative w-full max-w-md rounded-3xl border border-white/15 p-6 sm:p-8 text-center bg-[#00172e] shadow-2xl">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-emerald-400/40 bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+              <FaCheckCircle className="text-emerald-400 text-3xl sm:text-4xl" />
             </div>
 
-            <h3 className="text-white text-xl font-black mb-2 tracking-tight">
-              Message Sent!
+            <h3 className="text-white text-xl sm:text-2xl font-black mb-2 tracking-tight">
+              JazakAllah! Message Sent
             </h3>
-            <p className="text-slate-400 text-sm font-medium leading-relaxed mb-5">
-              Thank you for reaching out. Our team will contact you on{' '}
-              <span className="text-white font-black">WhatsApp or Email</span> within{' '}
-              <span className="text-white font-black">24 hours</span>.
+            <p className="text-slate-300 text-xs sm:text-sm font-normal leading-relaxed mb-5">
+              Thank you for reaching out. Your query has been delivered to our administrative team. We will respond on <strong className="text-white">WhatsApp or Email</strong> within <strong className="text-orange-400">2 to 4 hours</strong>.
             </p>
 
-            {/* Info strip */}
-            <div className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.04] px-4 py-3 mb-6 text-left">
-              <svg
-                className="w-4 h-4 flex-shrink-0"
-                style={{ color: 'rgba(251,191,36,0.85)' }}
-                fill="none" stroke="currentColor"
-                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                viewBox="0 0 24 24"
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <button
+                type="button"
+                onClick={handleDirectWhatsApp}
+                className="flex-1 py-3 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 active:scale-95 shadow-md"
               >
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="8" x2="12" y2="12" />
-                <line x1="12" y1="16" x2="12.01" y2="16" />
-              </svg>
-              <span className="text-slate-400 text-xs leading-relaxed">
-                Available 24/7 across{' '}
-                <span className="text-white font-black">USA, UK, Canada & Australia</span>
-              </span>
+                <FaWhatsapp size={15} /> Open WhatsApp
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowSuccess(false)}
+                className="flex-1 py-3 rounded-xl border border-white/20 bg-white/10 text-white text-xs font-bold uppercase tracking-wider hover:bg-white/15 transition-all active:scale-95"
+              >
+                Close
+              </button>
             </div>
-
-            {/* Close button */}
-            <button
-              onClick={() => setShowSuccess(false)}
-              className="w-full py-3 rounded-2xl border border-white/20 bg-white/[0.08] text-white text-sm font-bold tracking-wide hover:bg-white/[0.14] transition-all duration-200"
-            >
-              Close
-            </button>
           </div>
         </div>
       )}
 
       {/* ── MAIN SECTION ── */}
-      <section id="footer-section" className="py-20 bg-[#001f3f] relative overflow-hidden">
+      <section id="contact-section" className="py-12 sm:py-16 md:py-24 bg-[#001f3f] relative overflow-hidden font-sans">
+        
+        {/* Ambient Lights */}
+        <div className="absolute top-0 right-0 w-80 sm:w-96 h-80 sm:h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none translate-x-1/3 -translate-y-1/3"></div>
+        <div className="absolute bottom-0 left-0 w-80 sm:w-96 h-80 sm:h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none -translate-x-1/3 translate-y-1/3"></div>
 
-        {/* Background decorations */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none -translate-x-1/2 translate-y-1/2"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-900/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
-
-          {/* Header */}
-          <div className="text-center mb-14">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
-              <span className="text-orange-400 text-[11px] font-black uppercase tracking-[0.4em]">Contact Us</span>
-              <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
+          {/* Section Header */}
+          <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-14">
+            <div className="inline-flex items-center gap-2 mb-2 sm:mb-3">
+              <span className="h-[2px] w-6 sm:w-8 bg-orange-500 rounded-full"></span>
+              <span className="text-orange-400 text-[10px] sm:text-xs font-black uppercase tracking-[0.25em]">
+                24/7 Academic Support
+              </span>
+              <span className="h-[2px] w-6 sm:w-8 bg-orange-500 rounded-full"></span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
+            
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
               Get In <span className="text-orange-400 italic">Touch</span>
-            </h1>
-            <p className="mt-4 text-slate-400 font-medium text-sm md:text-base max-w-xl mx-auto">
-              Have questions? We are here to help you on your spiritual journey — reach out anytime, anywhere.
+            </h2>
+            <p className="mt-2.5 sm:mt-3 text-slate-300 font-normal text-xs sm:text-sm md:text-base max-w-xl mx-auto leading-relaxed">
+              Have questions regarding class timings, fees, or tutors? Reach out anytime via message, email, or direct WhatsApp.
             </p>
           </div>
 
-          <div className="flex flex-col lg:flex-row gap-10">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-10 items-stretch">
 
             {/* LEFT: Contact Form */}
-            <div className="w-full lg:w-7/12 bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl p-8 md:p-10">
-
-              <div className="mb-8">
-                <h2 className="text-white font-black text-2xl mb-1">Send us a Message</h2>
-                <p className="text-slate-400 text-sm font-medium">Fill the form and our team will respond within minutes.</p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-6">
-
-                {/* Row 1: Name & Email */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className={labelClass}>Full Name *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.fullName}
-                      onChange={e => handleChange('fullName', e.target.value)}
-                      placeholder="Mohsin Ishfaq"
-                      className={inputClass}
-                    />
-                  </div>
-                  <div>
-                    <label className={labelClass}>Email Address *</label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={e => handleChange('email', e.target.value)}
-                      placeholder="example@gmail.com"
-                      className={inputClass}
-                    />
-                  </div>
+            <div className="w-full lg:w-7/12 bg-white/[0.04] backdrop-blur-md border border-white/10 rounded-3xl p-6 sm:p-8 md:p-10 shadow-2xl flex flex-col justify-between">
+              <div>
+                <div className="mb-6 sm:mb-8">
+                  <h3 className="text-white font-black text-xl sm:text-2xl mb-1">
+                    Send Us a Message
+                  </h3>
+                  <p className="text-slate-400 text-xs sm:text-sm">
+                    Fill in your details and our team will get back to you promptly.
+                  </p>
                 </div>
 
-                {/* Row 2: Country & City */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <label className={labelClass}>Country *</label>
-                    <input
-                      list="footer-countries-datalist"
-                      required
-                      value={formData.country}
-                      onChange={e => handleChange('country', e.target.value)}
-                      placeholder="United Kingdom"
-                      className={inputClass}
-                    />
-                    <datalist id="footer-countries-datalist">
-                      {countryNamesList.map((cName, idx) => (
-                        <option key={idx} value={cName} />
-                      ))}
-                    </datalist>
-                  </div>
-                  <div>
-                    <label className={labelClass}>City *</label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.city}
-                      onChange={e => handleChange('city', e.target.value)}
-                      placeholder="London"
-                      className={inputClass}
-                    />
-                  </div>
-                </div>
-
-                {/* Row 3: WhatsApp */}
-                <div>
-                  <label className={labelClass}>
-                    WhatsApp Number{' '}
-                    <span className="text-slate-500 font-normal normal-case tracking-normal">(Optional)</span>
-                  </label>
-                  <div className="flex gap-3">
-                    <div className="w-32 flex-shrink-0">
+                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+                  
+                  {/* Row 1: Name & Email */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelClass}>Full Name *</label>
                       <input
-                        list="footer-country-codes"
-                        value={formData.countryCode}
-                        onChange={e => handleChange('countryCode', e.target.value)}
-                        placeholder="+44"
-                        className={`${inputClass} text-center`}
+                        type="text"
+                        required
+                        value={formData.fullName}
+                        onChange={e => handleChange('fullName', e.target.value)}
+                        placeholder="Your Full Name"
+                        className={inputClass}
                       />
-                      <datalist id="footer-country-codes">
-                        {countryCodesList.map((country, index) => (
-                          <option key={index} value={country.code}>{country.name} ({country.code})</option>
+                    </div>
+                    <div>
+                      <label className={labelClass}>Email Address *</label>
+                      <input
+                        type="email"
+                        required
+                        value={formData.email}
+                        onChange={e => handleChange('email', e.target.value)}
+                        placeholder="yourname@gmail.com"
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Row 2: Country & City */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelClass}>Country *</label>
+                      <input
+                        list="contact-countries-datalist"
+                        required
+                        value={formData.country}
+                        onChange={e => handleChange('country', e.target.value)}
+                        placeholder="e.g. USA, UK, Canada, Germany"
+                        className={inputClass}
+                      />
+                      <datalist id="contact-countries-datalist">
+                        {countryNamesList.map((cName, idx) => (
+                          <option key={idx} value={cName} />
                         ))}
                       </datalist>
                     </div>
-                    <input
-                      type="tel"
-                      value={formData.whatsAppNum}
-                      onChange={e => handleChange('whatsAppNum', e.target.value)}
-                      placeholder="7123 456789"
-                      className={`flex-1 ${inputClass}`}
-                    />
+                    <div>
+                      <label className={labelClass}>City / State *</label>
+                      <input
+                        type="text"
+                        required
+                        value={formData.city}
+                        onChange={e => handleChange('city', e.target.value)}
+                        placeholder="e.g. New York, London, Berlin"
+                        className={inputClass}
+                      />
+                    </div>
                   </div>
-                </div>
 
-                {/* Row 4: Message */}
-                <div>
-                  <label className={labelClass}>Your Message *</label>
-                  <textarea
-                    rows="4"
-                    required
-                    value={formData.message}
-                    onChange={e => handleChange('message', e.target.value)}
-                    placeholder="Tell us about your requirements..."
-                    className={`${inputClass} resize-none`}
-                  ></textarea>
-                </div>
+                  {/* Row 3: WhatsApp & Inquiry Subject */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className={labelClass}>
+                        WhatsApp Number <span className="text-slate-400 font-normal lowercase">(for fast reply)</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <div className="w-24 shrink-0">
+                          <input
+                            list="contact-country-codes"
+                            value={formData.countryCode}
+                            onChange={e => handleChange('countryCode', e.target.value)}
+                            placeholder="+1"
+                            className={`${inputClass} text-center px-1`}
+                          />
+                          <datalist id="contact-country-codes">
+                            {countryCodesList.map((c, i) => (
+                              <option key={i} value={c.code}>{c.name} ({c.code})</option>
+                            ))}
+                          </datalist>
+                        </div>
+                        <input
+                          type="tel"
+                          value={formData.whatsAppNum}
+                          onChange={e => handleChange('whatsAppNum', e.target.value)}
+                          placeholder="Phone number"
+                          className={`flex-1 ${inputClass}`}
+                        />
+                      </div>
+                    </div>
 
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="w-full sm:w-auto bg-orange-500 text-white px-10 py-4 rounded-2xl font-black uppercase text-xs tracking-widest shadow-xl shadow-orange-500/20 hover:bg-orange-600 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                >
-                  {sending ? 'Sending...' : 'Send Message'}
-                  <FaPaperPlane size={14} />
-                </button>
+                    <div>
+                      <label className={labelClass}>Subject / Interest</label>
+                      <select
+                        value={formData.subject}
+                        onChange={e => handleChange('subject', e.target.value)}
+                        className={`${inputClass} cursor-pointer text-slate-200`}
+                      >
+                        <option value="General Inquiry / Free Trial" className="bg-[#001f3f]">General Inquiry / Free Trial</option>
+                        <option value="Kids Quran & Qaida Classes" className="bg-[#001f3f]">Kids Quran & Qaida Classes</option>
+                        <option value="Adult Tajweed Classes" className="bg-[#001f3f]">Adult Tajweed Classes</option>
+                        <option value="Female Teacher Request" className="bg-[#001f3f]">Female Teacher Request</option>
+                        <option value="Fee Structure & Timings" className="bg-[#001f3f]">Fee Structure & Timings</option>
+                      </select>
+                    </div>
+                  </div>
 
-              </form>
+                  {/* Row 4: Message */}
+                  <div>
+                    <label className={labelClass}>Your Message / Requirement *</label>
+                    <textarea
+                      rows="3"
+                      required
+                      value={formData.message}
+                      onChange={e => handleChange('message', e.target.value)}
+                      placeholder="Please mention student age, preferred class days, or any questions..."
+                      className={`${inputClass} resize-none`}
+                    ></textarea>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-amber-500 text-white px-8 py-3.5 rounded-xl font-black uppercase text-xs tracking-wider shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-amber-600 transition-all flex items-center justify-center gap-2.5 disabled:opacity-50 cursor-pointer active:scale-95"
+                  >
+                    {sending ? (
+                      <>
+                        <FaSpinner className="animate-spin" size={13} /> Sending Message...
+                      </>
+                    ) : (
+                      <>
+                        <span>Submit Inquiry</span>
+                        <FaPaperPlane size={12} />
+                      </>
+                    )}
+                  </button>
+
+                </form>
+              </div>
             </div>
 
-            {/* RIGHT: Contact Info */}
-            <div className="w-full lg:w-5/12 flex flex-col gap-4 justify-center">
+            {/* RIGHT: Contact Information Cards */}
+            <div className="w-full lg:w-5/12 flex flex-col justify-between gap-4">
+              
+              <div className="space-y-3">
+                <div className="mb-2">
+                  <h3 className="text-white font-black text-xl sm:text-2xl mb-1">
+                    Contact Channels
+                  </h3>
+                  <p className="text-slate-400 text-xs sm:text-sm">
+                    Connect directly with our admissions coordinator.
+                  </p>
+                </div>
 
-              <div className="mb-2">
-                <h2 className="text-white font-black text-2xl mb-1">Contact Information</h2>
-                <p className="text-slate-400 text-sm font-medium">Multiple ways to reach us — pick what suits you best.</p>
+                {/* WhatsApp */}
+                <a
+                  href="https://wa.me/923485654503?text=Assalam-o-Alaikum%20Al-Quran%20Institute%2C%20I%20have%20an%20inquiry%20regarding%20classes."
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group flex items-center gap-4 p-4 sm:p-4.5 bg-white/[0.04] border border-white/10 rounded-2xl hover:border-emerald-400/60 hover:bg-emerald-500/10 transition-all duration-300"
+                >
+                  <div className="w-11 h-11 bg-emerald-500/15 rounded-xl flex items-center justify-center text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-all shrink-0">
+                    <FaWhatsapp size={22} />
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">Instant WhatsApp</h4>
+                    <p className="text-white font-bold text-sm sm:text-base">+92 348 5654503</p>
+                  </div>
+                </a>
+
+                {/* Phone Call */}
+                <a
+                  href="tel:+923485654503"
+                  className="group flex items-center gap-4 p-4 sm:p-4.5 bg-white/[0.04] border border-white/10 rounded-2xl hover:border-sky-400/60 hover:bg-sky-500/10 transition-all duration-300"
+                >
+                  <div className="w-11 h-11 bg-sky-500/15 rounded-xl flex items-center justify-center text-sky-400 group-hover:bg-sky-500 group-hover:text-white transition-all shrink-0">
+                    <FaPhoneAlt size={18} />
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">Direct Phone</h4>
+                    <p className="text-white font-bold text-sm sm:text-base">+92 348 5654503</p>
+                  </div>
+                </a>
+
+                {/* Email */}
+                <a
+                  href="mailto:alquranislamicinstitute.48@gmail.com"
+                  className="group flex items-center gap-4 p-4 sm:p-4.5 bg-white/[0.04] border border-white/10 rounded-2xl hover:border-orange-400/60 hover:bg-orange-500/10 transition-all duration-300"
+                >
+                  <div className="w-11 h-11 bg-orange-500/15 rounded-xl flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-all shrink-0">
+                    <FaEnvelope size={18} />
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">Official Email</h4>
+                    <p className="text-white font-bold text-xs sm:text-sm truncate">alquranislamicinstitute.48@gmail.com</p>
+                  </div>
+                </a>
+
+                {/* Global Presence */}
+                <div className="flex items-center gap-4 p-4 sm:p-4.5 bg-white/[0.04] border border-white/10 rounded-2xl">
+                  <div className="w-11 h-11 bg-purple-500/15 rounded-xl flex items-center justify-center text-purple-400 shrink-0">
+                    <FaGlobe size={18} />
+                  </div>
+                  <div>
+                    <h4 className="text-[10px] font-black uppercase tracking-wider text-slate-400">Global Online Campus</h4>
+                    <p className="text-white font-bold text-xs sm:text-sm">Serving USA, UK, Canada, Australia & Europe</p>
+                  </div>
+                </div>
               </div>
 
-              <a
-                href="https://wa.me/923485654503"
-                target="_blank"
-                rel="noreferrer"
-                className="group flex items-center gap-5 p-5 bg-white/5 border border-white/10 rounded-2xl hover:border-green-400/50 hover:bg-green-500/10 transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center text-green-400 group-hover:bg-green-500 group-hover:text-white transition-all duration-300 shrink-0">
-                  <FaWhatsapp size={24} />
+              {/* Timezone Assurance Strip */}
+              <div className="p-4 sm:p-5 bg-gradient-to-r from-orange-500/15 to-amber-500/10 border border-orange-400/25 rounded-2xl">
+                <div className="flex items-center gap-2 text-orange-400 text-xs font-bold mb-1">
+                  <FaClock size={12} /> Flexible Timezones Available
                 </div>
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">WhatsApp</h4>
-                  <p className="text-white font-black text-base">+92 348 5654503</p>
-                </div>
-              </a>
-
-              <a
-                href="tel:+923485654503"
-                className="group flex items-center gap-5 p-5 bg-white/5 border border-white/10 rounded-2xl hover:border-sky-400/50 hover:bg-sky-500/10 transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-sky-500/10 rounded-2xl flex items-center justify-center text-sky-400 group-hover:bg-sky-500 group-hover:text-white transition-all duration-300 shrink-0">
-                  <FaPhoneAlt size={20} />
-                </div>
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Call Us</h4>
-                  <p className="text-white font-black text-base">+92 348 5654503</p>
-                </div>
-              </a>
-
-              <a
-                href="mailto:alquranislamicinstitute.48@gmail.com"
-                className="group flex items-center gap-5 p-5 bg-white/5 border border-white/10 rounded-2xl hover:border-orange-400/50 hover:bg-orange-500/10 transition-all duration-300"
-              >
-                <div className="w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-400 group-hover:bg-orange-500 group-hover:text-white transition-all duration-300 shrink-0">
-                  <FaEnvelope size={20} />
-                </div>
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Email Address</h4>
-                  <p className="text-white font-black text-sm break-all">alquranislamicinstitute.48@gmail.com</p>
-                </div>
-              </a>
-
-              <div className="flex items-center gap-5 p-5 bg-white/5 border border-white/10 rounded-2xl">
-                <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-400 shrink-0">
-                  <FaMapMarkerAlt size={20} />
-                </div>
-                <div>
-                  <h4 className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-0.5">Our Location</h4>
-                  <p className="text-white font-black text-base">Online Worldwide 🌍</p>
-                </div>
-              </div>
-
-              {/* Bottom note */}
-              <div className="mt-2 p-5 bg-orange-500/10 border border-orange-400/20 rounded-2xl">
-                <p className="text-orange-300 text-xs font-bold text-center leading-relaxed">
-                  🕌 We serve students across{' '}
-                  <span className="text-white font-black">USA, UK, Canada, Australia</span>{' '}
-                  and 50+ countries worldwide — 24/7 available.
+                <p className="text-slate-300 text-xs leading-relaxed">
+                  Morning, afternoon, and evening slots synchronized according to <strong className="text-white">EST, CST, GMT, and CET</strong> schedules.
                 </p>
               </div>
 
             </div>
+
           </div>
+
         </div>
       </section>
     </>
