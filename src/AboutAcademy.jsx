@@ -1,22 +1,9 @@
 import React from 'react';
 import { FaGlobe, FaUserCheck, FaAward, FaLaptopCode, FaClock, FaStar } from 'react-icons/fa';
 
-import SEOEngine from './SEO/SEOEngine';
-import { AboutAcademySEO } from './SEO/AboutAcademySEO';
-
 const AboutAcademy = () => {
   return (
     <>
-      {/* 🚀 Dynamic EducationalOrganization & AboutPage Schema Injection */}
-      <SEOEngine 
-        title={AboutAcademySEO.title}
-        description={AboutAcademySEO.description}
-        canonicalUrl={AboutAcademySEO.canonicalUrl}
-        keywords={AboutAcademySEO.keywords}
-        ogImage={AboutAcademySEO.ogImage}
-        schemaJson={AboutAcademySEO.schema}
-      />
-
       <section id="about-academy" className="py-20 bg-gradient-to-b from-[#f0f4ff] to-[#e8f0fe] relative overflow-hidden">
         
         {/* Background Decorative Circles */}
@@ -32,10 +19,10 @@ const AboutAcademy = () => {
               <span className="text-orange-500 text-[11px] font-black uppercase tracking-[0.4em]">Who We Are</span>
               <span className="h-[2px] w-10 bg-orange-500 rounded-full"></span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-black text-blue-900 leading-tight tracking-tight">
+            <h2 className="text-4xl md:text-6xl font-black text-blue-900 leading-tight tracking-tight">
               About
               <span className="text-blue-900 italic"> Academy</span>
-            </h1>
+            </h2>
             <div className="mt-6">
               <p className="text-slate-600 font-medium leading-relaxed text-base md:text-lg">
                 <span className="text-orange-600 font-extrabold">Al Quran Islamic Institute</span> was founded 

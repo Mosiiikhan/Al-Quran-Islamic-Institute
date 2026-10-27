@@ -1,17 +1,19 @@
+const SITE_URL = "https://www.alquranislamic.com";
+
 export const homeSEO = {
-  title: "Al Quran Islamic Institute | 1-on-1 Online Quran Classes with Tajweed",
-  description: "Online Quran classes for kids and adults with certified tutors. 30 and 45-minute sessions in USA, UK, Canada. Free 3-day trial classes.",
-  canonicalUrl: "https://alquranislamicinstitute.com",
+  title: "Online Quran Classes | 1-on-1 Tutors | Free Trial",
+  description: "Learn Quran online with certified Tajweed tutors. 1-on-1 classes for kids, sisters and adults in USA, UK, Canada and Australia. Free trial available.",
+  canonicalUrl: `${SITE_URL}/`,
   keywords: "online quran academy, learn quran online, quran classes for kids, female quran tutor uk, online tajweed classes usa",
-  ogImage: "https://alquranislamicinstitute.com/logo.jpeg",
+  ogImage: `${SITE_URL}/logo.jpeg`,
   schema: {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "EducationalOrganization",
         "name": "Al Quran Islamic Institute",
-        "url": "https://alquranislamicinstitute.com",
-        "logo": "https://alquranislamicinstitute.com/logo.jpeg",
+        "url": `${SITE_URL}/`,
+        "logo": `${SITE_URL}/logo.jpeg`,
         "description": "Global online Quran academy offering 1-on-1 recitation, Tajweed, and Hifz classes for kids and adults worldwide."
       },
       {

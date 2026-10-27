@@ -10,6 +10,8 @@ import {
 import SEOEngine from './SEO/SEOEngine';
 import { blogPageSEO } from './SEO/blogPageSEO';
 
+const SITE_URL = "https://www.alquranislamic.com";
+
 const slugify = (text = '') => {
   return text
     .toString()
@@ -149,11 +151,18 @@ const BlogSection = ({ isFullPageDefault = false }) => {
     return matchesCat && matchesQuery;
   });
 
+  // 🚫 /blogs/:slug khula hai lekin us slug ka article exist nahi karta
+  const articleNotFound =
+    slug &&
+    !currentBlog &&
+    !loading &&
+    !blogs.some(b => (b.slug || slugify(b.title)) === slug);
+
   /* ══════════════════════════════════════════════════════════════
      VIEW A: INTERNATIONAL STANDARD ARTICLE READER (/blogs/:slug)
      ══════════════════════════════════════════════════════════════ */
   if (slug && currentBlog) {
-    const shareUrl = typeof window !== 'undefined' ? window.location.href : `https://alquranislamicinstitute.com/blogs/${slug}`;
+    const shareUrl = typeof window !== 'undefined' ? window.location.href : `${SITE_URL}/blogs/${slug}`;
     const cleanExcerpt = getPreview(currentBlog.content, 160);
 
     const articleSchema = {
@@ -161,23 +170,22 @@ const BlogSection = ({ isFullPageDefault = false }) => {
       "@type": "BlogPosting",
       "mainEntityOfPage": {
         "@type": "WebPage",
-        "@id": `https://alquranislamicinstitute.com/blogs/${slug}`
+        "@id": `${SITE_URL}/blogs/${slug}`
       },
       "headline": currentBlog.title,
       "description": cleanExcerpt,
-      "image": [currentBlog.image || "https://alquranislamicinstitute.com/logo.jpeg"],
+      "image": [currentBlog.image || `${SITE_URL}/logo.jpeg`],
       "datePublished": currentBlog.createdAt,
       "dateModified": currentBlog.updatedAt || currentBlog.createdAt,
-      "author": {
-        "@type": "Person",
-        "name": currentBlog.author || "Al Quran Academy Faculty"
-      },
+      "author": currentBlog.author
+        ? { "@type": "Person", "name": currentBlog.author }
+        : { "@type": "Organization", "name": "Al Quran Islamic Institute", "url": SITE_URL },
       "publisher": {
         "@type": "EducationalOrganization",
         "name": "Al Quran Islamic Institute",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://alquranislamicinstitute.com/logo.jpeg"
+          "url": `${SITE_URL}/logo.jpeg`
         }
       }
     };
@@ -188,9 +196,10 @@ const BlogSection = ({ isFullPageDefault = false }) => {
         <SEOEngine 
           title={`${currentBlog.title} | Al Quran Islamic Institute`}
           description={cleanExcerpt}
-          canonicalUrl={`https://alquranislamicinstitute.com/blogs/${slug}`}
+          canonicalUrl={`${SITE_URL}/blogs/${slug}`}
           keywords={`${currentBlog.category ? currentBlog.category.toLowerCase() + ', ' : ''}quran learning, tajweed rules, islamic articles`}
-          ogImage={currentBlog.image || "https://alquranislamicinstitute.com/logo.jpeg"}
+          ogImage={currentBlog.image || `${SITE_URL}/logo.jpeg`}
+          ogType="article"
           schemaJson={articleSchema}
         />
 
@@ -358,6 +367,15 @@ const BlogSection = ({ isFullPageDefault = false }) => {
      ══════════════════════════════════════════════════════════════ */
   return (
     <>
+      {/* 🚫 Missing article slug: Google isay index na kare */}
+      {articleNotFound && (
+        <SEOEngine 
+          title="Article Not Found | Al Quran Islamic Institute"
+          description="This article could not be found."
+          noindex
+        />
+      )}
+
       {/* 🚀 Sirf dedicated /blogs route par Blog catalog schema inject kare */}
       {isFullPageDefault && (
         <SEOEngine 

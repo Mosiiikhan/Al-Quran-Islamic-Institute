@@ -31,11 +31,20 @@ import BlogSection from './BlogSection';
 
 import { homeSEO } from './SEO/homeSEO';
 import SEOEngine from './SEO/SEOEngine';
+import NotFound from './NotFound';
 
 
 // ─── CODE SPLITTING (Matching Current Folder Structure) ─────────────────────
 const CoursesPage = lazy(() => import('./CoursesPage'));
 const CourseDetailPage = lazy(() => import('./assets/CourseDetailPage'));
+const AboutUsPage = lazy(() => import('./AboutUs'));
+
+// Country Landing Pages (src/CountryPages/)
+const CountryPage = lazy(() => import('./CountryPages/USA'));
+const UKPage = lazy(() => import('./CountryPages/UK'));
+const CanadaPage = lazy(() => import('./CountryPages/Canada'));
+const AustraliaPage = lazy(() => import('./CountryPages/Australia'));
+const NewYorkPage = lazy(() => import('./CountryPages/NewYork'));
 
 // Admin Modules
 const AdminLogin = lazy(() => import('./assets/Admin/Adminlogin'));
@@ -204,6 +213,9 @@ function App() {
           {/* 2. Isolated Dedicated Page for About Owner / CEO */}
           <Route path="/about-ceo" element={<AboutOwner />} />
 
+          {/* 2b. About Us (Academy) */}
+          <Route path="/about-us" element={<AboutUsPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
+
           {/* 3. All Courses Catalog (/courses) */}
           <Route path="/courses" element={<CoursesPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
           
@@ -215,6 +227,16 @@ function App() {
 
           {/* 6. Individual SEO Dynamic Blog Article Page (/blogs/:slug) */}
           <Route path="/blogs/:slug" element={<BlogSection />} />
+
+          {/* 7. Country Landing Pages */}
+          <Route path="/online-quran-classes-usa" element={<CountryPage country="usa" onDirectRegisterTrigger={handleTriggerRegistration} />} />
+          <Route path="/online-quran-classes-uk" element={<UKPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
+          <Route path="/online-quran-classes-canada" element={<CanadaPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
+          <Route path="/online-quran-classes-australia" element={<AustraliaPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
+          <Route path="/online-quran-classes-new-york" element={<NewYorkPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
+
+          {/* 8. 404 Page (noindex) - public layout ke andar, taake navbar/footer dikhe */}
+          <Route path="*" element={<NotFound />} />
         </Route>
 
         {/* ─── ADMIN AUTHENTICATION ROUTES ─── */}
@@ -268,9 +290,6 @@ function App() {
             </ProtectedRoute>
           } 
         />
-
-        {/* ─── 404 FALLBACK ─── */}
-        <Route path="*" element={<Navigate to="/" replace />} />
 
       </Routes>
     </Router>

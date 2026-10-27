@@ -42,7 +42,7 @@ const catalogSchema = {
   "@type": "ItemList",
   "name": "Online Quran Courses & Educational Programs",
   "description": "Comprehensive list of online Quranic and Islamic courses offered with certified native tutors.",
-  "url": "https://alquranislamicinstitute.com/courses"
+  "url": "https://alquranislamic.com/courses"
 };
 
 const CoursesPage = ({ onDirectRegisterTrigger }) => {
@@ -89,9 +89,9 @@ const CoursesPage = ({ onDirectRegisterTrigger }) => {
       <SEOEngine 
         title="Online Quran Courses & Programs | Al Quran Islamic Institute"
         description="Explore 1-on-1 online Quran classes including Noorani Qaida, Tajweed, Quran Memorization (Hifz), and Islamic Studies for kids, sisters, and adults."
-        canonicalUrl="https://alquranislamicinstitute.com/courses"
+        canonicalUrl="https://alquranislamic.com/courses"
         keywords="online quran courses, learn tajweed online, noorani qaida classes, hifz program online, female quran tutor"
-        ogImage="https://alquranislamicinstitute.com/logo.jpeg"
+        ogImage="https://alquranislamic.com/logo.jpeg"
         schemaJson={catalogSchema}
       />
 

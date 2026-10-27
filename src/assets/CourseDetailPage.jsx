@@ -8,6 +8,8 @@ import {
 
 import SEOEngine from '../SEO/SEOEngine';
 
+const SITE_URL = "https://www.alquranislamic.com";
+
 const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
   const { slug } = useParams();
   const location = useLocation();
@@ -79,18 +81,29 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
 
   if (error || !course) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 bg-[#f8faff]">
-        <div className="text-6xl mb-4">📖</div>
-        <h2 className="text-2xl font-black text-blue-900 mb-2">Program Not Found</h2>
-        <p className="text-slate-500 mb-6 text-sm">The course you are looking for might have been moved or updated.</p>
-        <Link to="/courses" className="px-6 py-3 bg-blue-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider">
-          Browse All Courses
-        </Link>
-      </div>
+      <>
+        {/* 🚫 Not-found page ko Google index na kare */}
+        <SEOEngine 
+          title="Program Not Found | Al Quran Islamic Institute"
+          description="This course page could not be found."
+          noindex
+        />
+
+        <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4 bg-[#f8faff]">
+          <div className="text-6xl mb-4">📖</div>
+          <h2 className="text-2xl font-black text-blue-900 mb-2">Program Not Found</h2>
+          <p className="text-slate-500 mb-6 text-sm">The course you are looking for might have been moved or updated.</p>
+          <Link to="/courses" className="px-6 py-3 bg-blue-900 text-white rounded-xl text-xs font-bold uppercase tracking-wider">
+            Browse All Courses
+          </Link>
+        </div>
+      </>
     );
   }
 
-  // 🚀 Dynamic Course Schema (JSON-LD) with Flexible Pricing Structure
+  // 🚀 Dynamic Course Schema (JSON-LD)
+  // Note: "offers" aur "courseWorkload" hata diye hain kyunke asli price / ISO duration data nahi hai.
+  // Jab price pakka ho to offers wapas add karna (price + priceCurrency ke saath).
   const courseSchema = {
     "@context": "https://schema.org",
     "@type": "Course",
@@ -99,18 +112,11 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
     "provider": {
       "@type": "EducationalOrganization",
       "name": "Al Quran Islamic Institute",
-      "url": "https://alquranislamicinstitute.com"
-    },
-    "offers": {
-      "@type": "Offer",
-      "category": "Flexible Subscription",
-      "priceCurrency": "USD",
-      "description": "Tuition fees depend on weekly class frequency (2, 3, or 5 days/week). 3-day free trial available."
+      "url": SITE_URL
     },
     "hasCourseInstance": {
       "@type": "CourseInstance",
-      "courseMode": "Online",
-      "courseWorkload": course.duration || "30-40 Mins per session"
+      "courseMode": "Online"
     }
   };
 
@@ -120,9 +126,9 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
       <SEOEngine 
         title={`${course.title} | Online Quran Classes`}
         description={course.desc}
-        canonicalUrl={`https://alquranislamicinstitute.com/courses/${slug}`}
+        canonicalUrl={`${SITE_URL}/courses/${slug}`}
         keywords={`${course.title.toLowerCase()}, learn ${course.title.toLowerCase()} online, quran tutor 1-on-1`}
-        ogImage="https://alquranislamicinstitute.com/logo.jpeg"
+        ogImage={`${SITE_URL}/logo.jpeg`}
         schemaJson={courseSchema}
       />
 

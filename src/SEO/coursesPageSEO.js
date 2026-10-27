@@ -1,9 +1,9 @@
 export const coursesPageSEO = {
   title: "Online Quran Courses & Programs | Al Quran Islamic Institute",
   description: "Explore accredited 1-on-1 Quran courses for kids and adults: Noorani Qaida, Tajweed Mastery, Hifz Quran, and Islamic Studies. Free 3-day trial classes available.",
-  canonicalUrl: "https://alquranislamicinstitute.com/courses",
+  canonicalUrl: "https://www.alquranislamic.com/courses",
   keywords: "online quran courses, learn noorani qaida, quran tajweed classes, online hifz program, female quran tutor uk usa",
-  ogImage: "https://alquranislamicinstitute.com/logo.jpeg",
+  ogImage: "https://www.alquranislamic.com/logo.jpeg",
 
   schema: {
     "@context": "https://schema.org",
@@ -21,7 +21,7 @@ export const coursesPageSEO = {
           "provider": {
             "@type": "EducationalOrganization",
             "name": "Al Quran Islamic Institute",
-            "url": "https://alquranislamicinstitute.com"
+            "url": "https://www.alquranislamic.com"
           }
         }
       },
@@ -35,7 +35,7 @@ export const coursesPageSEO = {
           "provider": {
             "@type": "EducationalOrganization",
             "name": "Al Quran Islamic Institute",
-            "url": "https://alquranislamicinstitute.com"
+            "url": "https://www.alquranislamic.com"
           }
         }
       },
@@ -49,7 +49,7 @@ export const coursesPageSEO = {
           "provider": {
             "@type": "EducationalOrganization",
             "name": "Al Quran Islamic Institute",
-            "url": "https://alquranislamicinstitute.com"
+            "url": "https://www.alquranislamic.com"
           }
         }
       },
@@ -63,7 +63,7 @@ export const coursesPageSEO = {
           "provider": {
             "@type": "EducationalOrganization",
             "name": "Al Quran Islamic Institute",
-            "url": "https://alquranislamicinstitute.com"
+            "url": "https://www.alquranislamic.com"
           }
         }
       }
