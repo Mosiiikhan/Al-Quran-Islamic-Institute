@@ -32,5 +32,6 @@ Disallow: /
 # ─── DEFAULT ───
 User-agent: *
 Allow: /
+Disallow: /admin
 
 Sitemap: https://www.alquranislamic.com/sitemap.xml
