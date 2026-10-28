@@ -1,114 +1,174 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Core Pages -->
   <url>
     <loc>https://www.alquranislamic.com/</loc>
     <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.alquranislamic.com/about-academy</loc>
     <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.alquranislamic.com/about-ceo</loc>
     <lastmod>2026-10-29</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.alquranislamic.com/courses</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/noorani-qaida-for-beginners</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/quran-reading-with-tajweed</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/online-quran-memorization-hifz</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/quran-recitation-with-tarteel</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/islamic-studies-for-kids</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/quran-translation-and-tafseer</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/quranic-arabic-language-course</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/ten-qiraat-specialization-course</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/female-quran-teacher-classes</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/courses/daily-salah-masnoon-dua-course</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.alquranislamic.com/blogs</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/blogs/how-to-learn-quran-online-for-beginners</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/blogs/noorani-qaida-for-kids-parents-guide</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/blogs/tajweed-rules-for-beginners</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/blogs/how-much-do-online-quran-classes-cost</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/blogs/how-to-memorize-quran-tips-for-beginners</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/blogs/how-to-choose-online-quran-classes-for-kids</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.alquranislamic.com/online-quran-classes-usa</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/online-quran-classes-uk</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/online-quran-classes-canada</loc>
-    <lastmod>2026-10-29/lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/online-quran-classes-australia</loc>
-    <lastmod>2026-10-29</lastmod>
-  </url>
-  <url>
-    <loc>https://www.alquranislamic.com/online-quran-classes-new-york</loc>
-    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.alquranislamic.com/contact</loc>
     <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
+
+  <!-- Courses -->
+  <url>
+    <loc>https://www.alquranislamic.com/courses</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/noorani-qaida-for-beginners</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/quran-reading-with-tajweed</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/online-quran-memorization-hifz</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/quran-recitation-with-tarteel</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/islamic-studies-for-kids</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/quran-translation-and-tafseer</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/quranic-arabic-language-course</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/ten-qiraat-specialization-course</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/female-quran-teacher-classes</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/courses/daily-salah-masnoon-dua-course</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Blogs -->
+  <url>
+    <loc>https://www.alquranislamic.com/blogs</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/blogs/how-to-learn-quran-online-for-beginners</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/blogs/noorani-qaida-for-kids-parents-guide</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/blogs/tajweed-rules-for-beginners</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/blogs/how-much-do-online-quran-classes-cost</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/blogs/how-to-memorize-quran-tips-for-beginners</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/blogs/how-to-choose-online-quran-classes-for-kids</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Country Landing Pages -->
+  <url>
+    <loc>https://www.alquranislamic.com/online-quran-classes-usa</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/online-quran-classes-uk</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/online-quran-classes-canada</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/online-quran-classes-australia</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.alquranislamic.com/online-quran-classes-new-york</loc>
+    <lastmod>2026-10-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
 </urlset>
