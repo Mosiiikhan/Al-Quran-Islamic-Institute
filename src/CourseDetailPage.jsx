@@ -1,13 +1,15 @@
 import React, { useEffect } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  FaCheckCircle, FaClock, FaSignal, 
+import {
+  FaCheckCircle, FaClock, FaSignal,
   FaGlobe, FaWhatsapp, FaShieldAlt, FaArrowLeft, FaCalendarAlt, FaHome, FaTable,
-  FaBookOpen, FaLaptopHouse, FaUserGraduate, FaStar
+  FaBookOpen, FaLaptopHouse, FaUserGraduate
 } from 'react-icons/fa';
 
 import SEOEngine from './SEO/SEOEngine';
 import { STATIC_COURSES } from './Courses';
+
+const SITE_URL = 'https://www.alquranislamic.com';
 
 // Har course ke authentic syllabus points aur learning outlines
 const COURSE_SYLLABUS_MAP = {
@@ -89,7 +91,7 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [slug]);
 
-  // Find course from static courses master data (INSTANT LOAD)
+  // Static courses master data se course dhoondo (INSTANT LOAD, backend nahi)
   const course = STATIC_COURSES.find(c => {
     const courseSlug = c.slug || c.title.toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-');
     return courseSlug === slug;
@@ -112,17 +114,24 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
     }
   };
 
-  // Agar course na mile toh clean fallback
+  // Agar course na mile: noindex taake Google is page ko index na kare
   if (!course) {
     return (
-      <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 bg-[#f8faff]">
-        <div className="text-5xl sm:text-6xl mb-4">📖</div>
-        <h2 className="text-2xl sm:text-3xl font-black text-[#001f3f] mb-2">Program Not Found</h2>
-        <p className="text-slate-500 mb-6 text-sm max-w-md">The course you are looking for might have been updated or moved.</p>
-        <Link to="/courses" className="px-6 py-3 bg-[#001f3f] hover:bg-orange-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-md">
-          Browse All Quran Courses
-        </Link>
-      </div>
+      <>
+        <SEOEngine
+          title="Program Not Found | Al Quran Islamic Institute"
+          description="This course page could not be found."
+          noindex
+        />
+        <div className="min-h-[70vh] flex flex-col items-center justify-center text-center px-4 bg-[#f8faff]">
+          <div className="text-5xl sm:text-6xl mb-4">📖</div>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#001f3f] mb-2">Program Not Found</h2>
+          <p className="text-slate-500 mb-6 text-sm max-w-md">The course you are looking for might have been updated or moved.</p>
+          <Link to="/courses" className="px-6 py-3 bg-[#001f3f] hover:bg-orange-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition-colors shadow-md">
+            Browse All Quran Courses
+          </Link>
+        </div>
+      </>
     );
   }
 
@@ -135,7 +144,11 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
     "Monthly performance evaluation reports sent to parents"
   ];
 
-  // 🚀 Dynamic Course Schema (JSON-LD) with Canonical Domain
+  // Fee page ke mutabiq: Hifz 45 min, baaki 30 min
+  const sessionLength = course.slug === 'online-quran-memorization-hifz' ? '45 Mins / Session' : '30 Mins / Session';
+
+  // Course schema: "offers" (bina price) aur "courseWorkload" (ISO format nahi) hata diye,
+  // kyunke ye Google ki structured-data warnings deti hain. Price pakka ho to offers wapas add karna.
   const courseSchema = {
     "@context": "https://schema.org",
     "@type": "Course",
@@ -144,18 +157,11 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
     "provider": {
       "@type": "EducationalOrganization",
       "name": "Al Quran Islamic Institute",
-      "url": "https://www.alquranislamic.com"
-    },
-    "offers": {
-      "@type": "Offer",
-      "category": "Flexible Subscription",
-      "priceCurrency": "USD",
-      "description": "Tuition fees depend on weekly class frequency (2, 3, or 5 days/week). 3-day free trial available."
+      "url": SITE_URL
     },
     "hasCourseInstance": {
       "@type": "CourseInstance",
-      "courseMode": "Online",
-      "courseWorkload": course.duration || "30-40 Mins per session"
+      "courseMode": "Online"
     }
   };
 
@@ -163,18 +169,18 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
 
   return (
     <>
-      <SEOEngine 
+      <SEOEngine
         title={`${course.title} | Online Quran Classes`}
         description={course.desc}
-        canonicalUrl={`https://www.alquranislamic.com/courses/${slug}`}
+        canonicalUrl={`${SITE_URL}/courses/${slug}`}
         keywords={`${course.title.toLowerCase()}, learn ${course.title.toLowerCase()} online, quran tutor 1-on-1`}
-        ogImage="https://www.alquranislamic.com/logo.jpeg"
+        ogImage={`${SITE_URL}/logo.jpeg`}
         schemaJson={courseSchema}
       />
 
       <div className="bg-[#f8faff] min-h-screen py-6 sm:py-10 md:py-14">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          
+
           {/* Smart Back Navigation Bar */}
           <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8">
             <button
@@ -202,7 +208,7 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
 
           {/* Hero Banner Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 items-start">
-            
+
             {/* Main Details (Left 2 Columns) */}
             <div className="lg:col-span-2 space-y-6 sm:space-y-8">
               <div className="bg-white rounded-3xl p-6 sm:p-8 md:p-10 shadow-sm border border-slate-100 relative overflow-hidden">
@@ -275,7 +281,7 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
                 <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 to-amber-500"></div>
 
                 <div className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tuition & Pricing</div>
-                
+
                 <div className="mb-4">
                   <div className="text-xl sm:text-2xl font-black text-[#001f3f] leading-tight">Flexible Monthly Plans</div>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
@@ -294,7 +300,7 @@ const CourseDetailPage = ({ onDirectRegisterTrigger }) => {
                 <div className="space-y-3 mb-6 border-y border-slate-100 py-4 text-xs font-semibold text-slate-600">
                   <div className="flex justify-between items-center">
                     <span className="flex items-center gap-2"><FaClock className="text-orange-500" /> Session Duration</span>
-                    <span className="text-[#001f3f] font-bold">30 Mins / Session</span>
+                    <span className="text-[#001f3f] font-bold">{sessionLength}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="flex items-center gap-2"><FaSignal className="text-blue-500" /> Level</span>

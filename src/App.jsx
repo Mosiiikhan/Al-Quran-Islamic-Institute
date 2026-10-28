@@ -33,12 +33,10 @@ import { homeSEO } from './SEO/homeSEO';
 import SEOEngine from './SEO/SEOEngine';
 import NotFound from './NotFound';
 
-
 // ─── CODE SPLITTING (Matching Current Folder Structure) ─────────────────────
 const CoursesPage = lazy(() => import('./CoursesPage'));
-const CourseDetailPage = lazy(() => import('./assets/CourseDetailPage'));
-const AboutUsPage = lazy(() => import('./AboutUs'));
-
+const CourseDetailPage = lazy(() => import('./CourseDetailPage'));
+const ContactPage = lazy(() => import('./ContactPage'));
 // Country Landing Pages (src/CountryPages/)
 const CountryPage = lazy(() => import('./CountryPages/USA'));
 const UKPage = lazy(() => import('./CountryPages/UK'));
@@ -213,8 +211,8 @@ function App() {
           {/* 2. Isolated Dedicated Page for About Owner / CEO */}
           <Route path="/about-ceo" element={<AboutOwner />} />
 
-          {/* 2b. About Us (Academy) */}
-          <Route path="/about-us" element={<AboutUsPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
+          {/* 2b. About Academy (Direct component loaded on /about-academy) */}
+          <Route path="/about-academy" element={<AboutAcademy />} />
 
           {/* 3. All Courses Catalog (/courses) */}
           <Route path="/courses" element={<CoursesPage onDirectRegisterTrigger={handleTriggerRegistration} />} />
@@ -224,6 +222,8 @@ function App() {
           
           {/* 5. Complete Blogs Catalog */}
           <Route path="/blogs" element={<BlogSection isFullPageDefault={true} />} />
+
+          <Route path="/contact" element={<ContactPage />} />
 
           {/* 6. Individual SEO Dynamic Blog Article Page (/blogs/:slug) */}
           <Route path="/blogs/:slug" element={<BlogSection />} />
