@@ -1,7 +1,7 @@
 const SITE_URL = "https://www.alquranislamic.com";
 
 export const homeSEO = {
-  title: "Online Quran Classes | 1-on-1 Tutors | Free Trial",
+  title: "Al Quran Islamic Institute | Online Quran Academy",
   description: "Learn Quran online with certified Tajweed tutors. 1-on-1 classes for kids, sisters and adults in USA, UK, Canada and Australia. Free trial available.",
   canonicalUrl: `${SITE_URL}/`,
   keywords: "online quran academy, learn quran online, quran classes for kids, female quran tutor uk, online tajweed classes usa",
