@@ -1,5 +1,5 @@
 export const contactUsSEO = {
-  title: "Al Quran Islamic Institute | Online Quran & Tajweed Classes Worldwide",
+  title: "Al Quran Islamic Institute | Online Quran Academy",
   description: "Get in touch with Al Quran Islamic Institute. Register for 3-day free trial Quran classes or contact our global academic support team via WhatsApp and email.",
   canonicalUrl: "https://www.alquranislamic.com/contact-us",
   keywords: "contact quran academy, book free quran trial, quran tutor whatsapp number, online quran customer support",
